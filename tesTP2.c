@@ -14,9 +14,9 @@ int main(){
   printf("x=%f %f  \n", x[0], x[1]);
 	
   typel=2;
-  w=malloc(3*sizeof(float));
+  w=malloc(3*sizeof(float)); 
   calFbase(typel, x, w);
-  printf("pout tout i, wi(x) = %f %f %f %f\n", w[0], w[1], w[2], w[3]);
+  printf("pout tout i, wi(x) = %f %f %f\n", w[0], w[1], w[2]);  // w est de taille 3
   
   float **dw=alloctabf(3,2);
   calDerFbase(typel, x, dw);
