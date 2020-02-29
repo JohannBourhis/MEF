@@ -35,7 +35,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
   // Mini-matrice pour les aretes
   float SMbrAret, MatAret;
   SMbrAret = malloc(2*sizeof(float)); if(SMbrAret == NULL){return 1;}
-  MatAret = alloctab(2,2); if(MatAret == NULL){return 1;}
+  MatAret = alloctabf(2,2); if(MatAret == NULL){return 1;}
   
   //Initialisations de NuDElem, uDElem, SMbrElem et MatElem
   for(i=0; i<nbneel; i++){
@@ -99,6 +99,6 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
     }
   }
   free(SMbrAret)
-  free(MatAret)
+  freetab(MatAret)
   return 0;
 }
