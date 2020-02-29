@@ -15,3 +15,7 @@ float BN(float *x);
 float FOMEGA(float *x);
 float FN(float *x);
 float UD(float *x);
+
+// intégration
+void W(int nbneel, float *fctbas, float eltdif, float cofvar, float *vectelm);
+void WW(int nbneel, float *fctbas, float eltdif, float cofvar, float **matelm);
