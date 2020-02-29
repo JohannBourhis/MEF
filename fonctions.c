@@ -1,3 +1,4 @@
+#include "int.h"
 
 float A12(float *x){
 	return 0.0;
