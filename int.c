@@ -216,31 +216,31 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
 
 // fonctions
 float A12(float *x){
-	return 0.0;
+  return 0.0;
 }
 float A11(float *x){
-	return 1.0;
+  return 1.0;
 }
 float A22(float *x){
-	return 1.0;
+  return 1.0;
 }
 float A21(float *x){
-	return 0.0;
+  return 0.0;
 }
 float A00(float *x){
-	return 1.0;
+  return 1.0;
 }
 float BN(float *x){
-	return 0.0;
+  return 0.0;
 }
 float FOMEGA(float *x){
-	return 1.0;
+  return 1.0;
 }
 float FN(float *x){
-	return 1.0;
+  return 1.0;
 }
 float UD(float *x){
-	return 100*(x[0])+x[1];
+  return 100*x[0]+x[1];
 }
 
 // intégration
@@ -315,17 +315,17 @@ Arguments d'entrée :
   matelm : matrice élémentaire de masse actualisée
  ------------------------------------------- */ 
 void ADWDW(int nbneel, float **Derfctbas, float **InvJac, float eltdif, float *cofvar, float **matelm){
- 	int i,j;
- 	float coeff0, coeff1, Derfct0, Derfct1;
- 	for(i=0; i<nbneel; i++){
- 		Derfct0=Derfctbas[0,i]*InvJac[0,0] + Derfctbas[1,i]*InvJac[0,1]; 
- 		Derfct1=Derfctbas[0,i]*InvJac[1,0] + Derfctbas[1,i]*InvJac[1,1];
- 		coeff0=eltdif*(cofvar[0]*Derfct0 + cofvar[2]*Derfct1); // JFk*(a_11*dwi/dx1 + a_21*dwi/dx2) 
- 		coeff1=eltdif*(cofvar[1]*Derfct0 + cofvar[3]*Derfct1); // JFk*(a_12*dwi/dx1 + a_22*dwi/dx2) 
- 		for(j=0;j<nbneel;j++){
- 			matelm[i][j]=matelm[i][j] + coeff0*(Derfctbas[0,j]*InvJac[0,0] + Derfctbas[1,j]*InvJac[0,1]) + coeff1*(Derfctbas[0,i]*InvJac[1,0] + Derfctbas[1,i]*InvJac[1,1]);
-
- 			// on somme sur les != points de quad grâce aux appels de la fonction
- 		}
- 	}
+  int i,j;
+  float coeff0, coeff1, Derfct0, Derfct1;
+  for(i=0; i<nbneel; i++){
+    Derfct0=Derfctbas[0,i]*InvJac[0,0] + Derfctbas[1,i]*InvJac[0,1]; 
+    Derfct1=Derfctbas[0,i]*InvJac[1,0] + Derfctbas[1,i]*InvJac[1,1];
+    coeff0=eltdif*(cofvar[0]*Derfct0 + cofvar[2]*Derfct1); // JFk*(a_11*dwi/dx1 + a_21*dwi/dx2) 
+    coeff1=eltdif*(cofvar[1]*Derfct0 + cofvar[3]*Derfct1); // JFk*(a_12*dwi/dx1 + a_22*dwi/dx2) 
+    for(j=0;j<nbneel;j++){
+      matelm[i][j]=matelm[i][j] + coeff0*(Derfctbas[0,j]*InvJac[0,0] + Derfctbas[1,j]*InvJac[0,1]) + 
+	      coeff1*(Derfctbas[0,i]*InvJac[1,0] + Derfctbas[1,i]*InvJac[1,1]);
+      // on somme sur les != points de quad grâce aux appels de la fonction
+    }
+  }
 }
