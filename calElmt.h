@@ -11,3 +11,5 @@ void transFk(int nbneel, float **S, float Y[], float *foncbase);
 void numNaret(int typel, int aretNum, int ptsNum[]);
 
 void selectPts(int nb, int num[], float *coorEns[], float *coorSel[]);
+
+void ppquad(int t, float *W, float **X);
