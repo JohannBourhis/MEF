@@ -6,12 +6,12 @@ int cal1Elem( int typel, int nbneel, int nbaret, int nRefDom, float **coorEl,
       float *uDElem);
 
 // fonctions
-float A12(float *x);
-float A11(float *x);
-float A22(float *x);
-float A21(float *x);
-float A00(float *x);
-float BN(float *x);
-float FOMEGA(float *x);
-float FN(float *x);
-float UD(float *x);
+float A12(float x);
+float A11(float x);
+float A22(float x);
+float A21(float x);
+float A00(float x);
+float BN(float x);
+float FOMEGA(float x);
+float FN(float x);
+float UD(float x);
