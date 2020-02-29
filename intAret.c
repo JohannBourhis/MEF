@@ -1,14 +1,15 @@
 
 /*==============================================
-Arguments d'entrée :
-	float **coorAr : coordonnées des noeuds de l'arrete selectionée
+Arguments d'entrÃ©e :
+	float **coorAr : coordonnÃ©es des noeuds de l'arrete selectionÃ©e
 				
 Arguments de sortie :
-	float* I_w : les valeurs de l'intégrale de f*w_i sur K, pour tout i
-	float** I_ww : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
+	float* I_w : les valeurs de l'intÃ©grale de f*w_i sur K, pour tout i
+	float** I_ww : les valeurs de l'intÃ©grale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
 #include "maille.h"
 #include "calElmt.h"
+#include "int.h"
 
 int intAret(float **coorAR, int *num_noeuds, float* I_w, float **I_ww){
   int i, typel=3, n_quad=3;
@@ -46,7 +47,7 @@ int intAret(float **coorAR, int *num_noeuds, float* I_w, float **I_ww){
     eltdif=L*Wq[i];
     cofvar_W=FN(Fk_xq);
     cofvar_WW=BN(Fk_xq);
-    // Calcul des int�grales
+    // Calcul des intégrales
     W(nbneel, fctbase, eltdif, cofvar_W, I_w);
     WW(nbneel, fctbase, eltdif, cofvar_WW, I_ww);
   }
