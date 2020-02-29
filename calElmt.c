@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include "calElmt.h"
 
-void ppquad(int nbneel, float *W, float **X, int *nQuad){
+void ppquad(int nbneel, float *W, float **X){
   switch(nbneel){
     case 4 :
-      *nQuad=9;
       for(int i=0; i<4; i++){
         W[i]=1./36;
       }
@@ -24,7 +23,6 @@ void ppquad(int nbneel, float *W, float **X, int *nQuad){
       X[8][0]=1./2; X[8][1]=1./2;
       break;
     case 3 :
-      *nQuad=3;
       for(int i=0; i<2; i++){
         W[i]=1./6;
       }
@@ -33,7 +31,6 @@ void ppquad(int nbneel, float *W, float **X, int *nQuad){
       X[2][0]=1./2; X[2][1]=0;
       break;
     case 2 :
-      *nQuad=3;
       W[0]=1./6; W[1]=1./6; W[2]=2./3; 
       X[0][0] = 1; X[1][0] = 0; X[2][0] = 1./2;
       break;
