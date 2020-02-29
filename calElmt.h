@@ -1,6 +1,6 @@
-void ppquad(int nbneel, float *W, float **X, int *nQuad);
+void ppquad(int nbneel, float *W, float **X);
 
-void invertM2x2(float **M, float *det, float **M_inv);
+void invertM2x2(float **M, float *detM, float **MInv);
 
 void matJacob(int nbneel, int dimDom, float **JacFk, float **S, float **Dfoncbase);
 
