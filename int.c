@@ -14,56 +14,56 @@ Arguments de sortie :
 	float* SmbreElm : Les éléments du second membre, pour tout i
 ===============================================*/
 int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
-  int i, j, k, nbneel, n_quad;
+  int i, j, k, nbneel, nQuad;
   float *Wq, **Xq, *fctbase, **Derfctbase;
-  float *Fk_xq, **Jac, det_Jac, **Inv_Jac, eltdif;
-  float cofvar_W, cofvar_WW, *cofvar_ADWDW;
+  float *Fk, **Jac, detJac, **InvJac, eltdif;
+  float cofvarW, cofvarWW, *cofvarADWDW;
   float eps=EPS
   switch(nbneel){
     case 4 :
-      n_quad=9;
+      nQuad=9;
       break;
     case 3 :
-      n_quad=3;
+      nQuad=3;
       break;
     default :
       printf("Erreur dans le type transmis a intElem");
       return 2;
       break;
   }
-  cofvar_ADWDW=malloc(4*sizeof(float));
-  Fk_xq=malloc(2*sizeof(float)); if(Fk_xq==NULL){return 1;}
+  cofvarADWDW=malloc(4*sizeof(float));
+  Fk=malloc(2*sizeof(float)); if(Fk==NULL){return 1;}
   Jac=alloctabf(2,2); if(Jac==NULL){return 1;}
-  Inv_Jac=alloctabf(2,2); if(Inv_Jac==NULL){return 1;}
-  Wq=malloc(n_quad*sizeof(float)); if(Wq==NULL){return 1;} // points et poids de quadrature
-  Xq=alloctabf(n_quad,2); if(Xq==NULL){return 1;}
+  InvJac=alloctabf(2,2); if(InvJac==NULL){return 1;}
+  Wq=malloc(nQuad*sizeof(float)); if(Wq==NULL){return 1;} // points et poids de quadrature
+  Xq=alloctabf(nQuad,2); if(Xq==NULL){return 1;}
   fctbase=malloc(nbneel*sizeof(float)); if(fctbase==NULL){return 1;}
   Derfctbase=alloctabf(nbneel,2); if(Derfctbase==NULL){return 1;}
   // Calcul des points de quadrature de l'élément de référence
   ppquad(nbneel, Wq, Xq);
-  for(i=0 ; i<n_quad ; i++){
+  for(i=0 ; i<nQuad ; i++){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
-    transFK(nbneel, coorEl, fctbase, Fk_xq); // Fk_xq : valeur de Fk en xq[i]
+    transFK(nbneel, coorEl, fctbase, Fk); // Fk : valeur de Fk en xq[i]
     matJacob(nbneel, 2, Jac, coorEl, Derfctbase);
-    invertM2x2(Jac, det_Jac, Inv_Jac);
-    det_Jac = fabsf(det_Jac)
-    if(det_Jac < 10e-6){
+    invertM2x2(Jac, detJac, InvJac);
+    detJac = fabsf(detJac)
+    if(detJac < 10e-6){
       printf("Matrice singuliere")
       return 3;
     }
-    eltdif=det_Jac*Wq[i];
-    cofvar_W=FOMEGA(Fk_xq);
-    cofvar_WW=A00(Fk_xq);
-    cofvar_ADWDW[0]=A11(Fk_xq); cofvar_ADWDW[1]=A12(Fk_xq); 
-    cofvar_ADWDW[2]=A21(Fk_xq); cofvar_ADWDW[3]=A22(Fk_xq);
+    eltdif=detJac*Wq[i];
+    cofvarW=FOMEGA(Fk);
+    cofvarWW=A00(Fk);
+    cofvarADWDW[0]=A11(Fk); cofvarADWDW[1]=A12(Fk); 
+    cofvarADWDW[2]=A21(Fk); cofvarADWDW[3]=A22(Fk);
     // Calcul des integrales
-    W(nbneel, fctbas, eltdif, cofvar_W, SMbrElm);
-    WW(nbneel, fctbas, eltdif, cofvar_WW, MatElem);
-    ADWDW(nbneel, Derfctbase, Inv_Jac, eltdif, cofvar_ADWDW, MatElem);
+    W(nbneel, fctbas, eltdif, cofvarW, SMbrElm);
+    WW(nbneel, fctbas, eltdif, cofvarWW, MatElem);
+    ADWDW(nbneel, Derfctbase, InvJac, eltdif, cofvarADWDW, MatElem);
   }
-  free(cofvar_ADWDW); free(Fk_xq);
-  freetab(Jac); freetab(Inv_Jac);
+  free(cofvarADWDW); free(Fk);
+  freetab(Jac); freetab(InvJac);
   free(Wq); freetab(Xq);
   free(fctbase); freetab(Derfctbase);
   return 0;
@@ -75,40 +75,40 @@ Arguments d'entrée :
 	float **coorAr : coordonnÃ©es des noeuds de l'arrete selectionÃ©e
 				
 Arguments de sortie :
-	float* I_w : les valeurs de l'intÃ©grale de f*w_i sur K, pour tout i
-	float** I_ww : les valeurs de l'intÃ©grale de a*w_i*w_j sur K, pour tout i,j
+	float* SMbrAret : les valeurs de l'intégrale de f*w_i sur K, pour tout i
+	float** MatAret : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
-int intAret(float **coorAR, int *num_noeuds, float* I_w, float **I_ww){
-  int i, nbneel=2, n_quad=3;
+int intAret(float **coorAR, int *numNoeuds, float* SMbrAret, float **MatAret){
+  int i, nbneel=2, nQuad=3;
   float *Wq, *Xq;
   float *fctbase, **Derfctbase;
-  float *Fk_xq, **Jac, eltdif; 
-  float cofvar_W, cofvar_WW;
+  float *Fk, **Jac, eltdif; 
+  float cofvarW, cofvarWW;
 
-  Fk_xq=malloc(2*sizeof(float)); if(Fk_xq == NULL){return 1;}
+  Fk=malloc(2*sizeof(float)); if(Fk == NULL){return 1;}
   Jac=alloctabf(2,1); if(Jac == NULL){return 1;}
-  Wq=malloc(n_quad*sizeof(float)); if(Wq == NULL){return 1;} // points et poids de quadrature
-  Xq=malloc(n_quad*sizeof(float));  if(Xq == NULL){return 1;} // sur les aretes les points de quadrature sont des reels
+  Wq=malloc(nQuad*sizeof(float)); if(Wq == NULL){return 1;} // points et poids de quadrature
+  Xq=malloc(nQuad*sizeof(float));  if(Xq == NULL){return 1;} // sur les aretes les points de quadrature sont des reels
   fctbase=malloc(nbneel*sizeof(float)); if(fctbase == NULL){return 1;}
   Derfctbase=allocatbf(nbneel,1); if(Derfctbase == NULL){return 1;}
 
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
-  for(i=0; i<n_quad; i++){
+  for(i=0; i<nQuad; i++){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
-    xq_Fk[0]=xq[i]*(coorAr[0][0]-coorAr[1][0])+coorAr[0][0];   // coorAr[0][0]-coorAr[1][0]=Jac[0]
-    xq_Fk[1]=xq[i]*(coorAr[0][1]-coorAr[1][1])+coorAr[0][1];   // Jac[1]
+    Fk[0]=Xq[i]*(coorAr[0][0]-coorAr[1][0])+coorAr[0][0];   // coorAr[0][0]-coorAr[1][0]=Jac[0]
+    Fk[1]=Xq[i]*(coorAr[0][1]-coorAr[1][1])+coorAr[0][1];   // Jac[1]
     L=sqrt(Jac[0][0]*Jac[0][0] + Jac[1][0]*Jac[1][0]);	
     eltdif=L*Wq[i];
-    cofvar_W=FN(Fk_xq);
-    cofvar_WW=BN(Fk_xq);
+    cofvarW=FN(Fk);
+    cofvarWW=BN(Fk);
     // Calcul des intégrales
-    W(nbneel, fctbase, eltdif, cofvar_W, I_w);
-    WW(nbneel, fctbase, eltdif, cofvar_WW, I_ww);
+    W(nbneel, fctbase, eltdif, cofvarW, SMbrAret);
+    WW(nbneel, fctbase, eltdif, cofvarWW, MatAret);
   }
-  free(Fk_xq); free(Jac);
+  free(Fk); free(Jac);
   free(Wq); free(Xq);
   free(fctbase); freetab(Derfctbase);
   return 0;
@@ -140,8 +140,8 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
   int nbRefD0, float *numRefD0, int nbRefD1, float *numRefD1, int nbRefF1, float *numRefF1, 
     float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
-  int i, j, k, l, nk, nl, R, numAr, cond_Ar;
-  int *num_noeuds, float *coorAr;
+  int i, j, k, l, nk, nl, R, numAr, condAr;
+  int *numNoeuds, float *coorAr;
   
   // Mini-matrice pour les aretes
   float SMbrAret, MatAret;
@@ -164,44 +164,44 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
   
   //Prise en compte des conditions aux limites
   for (i=0; i<nbaret ; i++){   // (i+1) numéro local de l'arrete
-    cond_Ar=nRefArEl[i];
-    if (cond_Ar == nRefDom){
+    condAr=nRefArEl[i];
+    if (condAr == nRefDom){
       continue; // on passe au i suivant 
     }
     // Dirichlet homogène
     for (j=0; j<nbRefD0; j++){
-      if (numRefD0[j]==cond_Ar){  
-        numNaret(nbneel, i+1, num_noeuds);  
-        NuDElem[num_noeuds[0]]=1;
-        NuDElem[num_noeuds[1]]=1;        
+      if (numRefD0[j]==condAr){  
+        numNaret(nbneel, i+1, numNoeuds);  
+        NuDElem[numNoeuds[0]]=1;
+        NuDElem[numNoeuds[1]]=1;        
         break;
       }
     }
     // Dirichlet non-homogène
     for(j=0; j<nbRefD1; j++){
-      if (numRefD1[j]==cond_Ar) {  
-        numNaret(nbneel, i+1, num_noeuds);  
-        NuDElem[num_noeuds[0]]=-1;
-        NuDElem[num_noeuds[1]]=-1;
-        selectPts(2,num_noeuds, coorEl, coorAr);
-        uDElem[num_noeuds[0]]=UD(coorAr[0]);
-        uDElem[num_noeuds[1]]=UD(coorAr[1]);
+      if (numRefD1[j]==condAr) {  
+        numNaret(nbneel, i+1, numNoeuds);  
+        NuDElem[numNoeuds[0]]=-1;
+        NuDElem[numNoeuds[1]]=-1;
+        selectPts(2,numNoeuds, coorEl, coorAr);
+        uDElem[numNoeuds[0]]=UD(coorAr[0]);
+        uDElem[numNoeuds[1]]=UD(coorAr[1]);
         break;
       }
     }
     // Neumann ou Fourier     // num-noeuds decale les indices
     for(j=0; j<nbRefF1; j++){
-      if (numRefF1[j]==cond_Ar) {  
-        numNaret(nbneel, i+1, num_noeuds);  
-        selectPts(2,num_noeuds, coorEl, coorAr);
+      if (numRefF1[j]==condAr) {  
+        numNaret(nbneel, i+1, numNoeuds);  
+        selectPts(2,numNoeuds, coorEl, coorAr);
         //Calcul des intégrales linéiques 
         R = intAret(coorAr, SMbrAret, MatAret) 
         if(R){return R;}
         for(k=0; k<nbneel; k++){
-          nk = num_noeuds[k]-1;
+          nk = numNoeuds[k]-1;
           SMbrElem[nk] += SMbrAret[k];
           for(l=0; l<nbneel; l++){
-            nl = num_noeuds[l]-1;
+            nl = numNoeuds[l]-1;
             MatElem[nk][nl]+=MatAret[k][l]; 
           }
         }
