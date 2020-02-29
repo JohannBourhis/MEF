@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "maille.h"
+#include "calElmt.h"
 
 void ppquad(int t, float *W, float **X){
   switch(t){
