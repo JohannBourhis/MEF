@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "calElmt.h"
 
-void ppquad(int t, float *W, float **X){
-  switch(t){
-    case 1 :
+void ppquad(int nbneel, float *W, float **X){
+  switch(nbneel){
+    case 4 :
       for(int i=0; i<4; i++){
         W[i]=1./36;
       }
@@ -21,19 +21,19 @@ void ppquad(int t, float *W, float **X){
       X[6][0]=0; X[6][1]=1./2;
       X[7][0]=1./2; X[7][1]=0;
       X[8][0]=1./2; X[8][1]=1./2;
-    break;
-    case 2 :
+      break;
+    case 3 :
       for(int i=0; i<2; i++){
         W[i]=1./6;
       }
       X[0][0]=1./2; X[0][1]=1./2;
       X[1][0]=0; X[1][1]=1./2;
       X[2][0]=1./2; X[2][1]=0;
-    break;
-    case 3 :
+      break;
+    case 2 :
       W[0]=1./6; W[1]=1./6; W[2]=2./3; 
       X[0][0] = 1; X[1][0] = 0; X[2][0] = 1./2;
-    break;
+      break;
   }
 }
 
@@ -73,102 +73,102 @@ void transFk(int nbneel, float **S, float Y[], float *foncbase){
   }
 }
 
-void calDerFbase(int typel, float *x, float **w){
+void calDerFbase(int nbneel, float *x, float **w){
   /* 
   On renvoie un vecteur de taille n qui correspond 
   aux valeurs des gradients fonctions de base en un point x
   et on a : w_k(s_i)=delta_ki pour une sommet si donné
   */
-  switch(typel){
-  case 1 : // quadrangle 
+  switch(nbneel){
+  case 4 : // quadrangle 
     /*  4  3
         1  2 */
     w[0][0]=-1+x[1]; w[0][1]=-1+x[0]; 
     w[1][0]=1-x[1];  w[1][1]=-x[0];
     w[2][0]=-x[1];   w[2][1]=1-x[0];
     w[3][0]=x[1];    w[3][1]=x[0];
-  break;
-  case 2 : // triangle 	
+    break;
+  case 3 : // triangle 	
     w[0][0]=-1; w[0][1]=-1; 
     w[1][0]=1;  w[1][1]=0;
     w[2][0]=0;  w[2][1]=1;
-  break;
-  case 3 : // segment
+    break;
+  case 2 : // segment
     /*  2  1    */		
     w[0][0]=1;
     w[0][1]=-1;
-  break;
+    break;
   }
 }
 
-void calFbase(int typel, float *x, float *w){
+void calFbase(int nbneel, float *x, float *w){
   /* 
   On renvoie un vecteur de taille n qui correspond 
   aux valeurs des fonctions de base en un point x
   et on a : w_k(s_i)=delta_ki pour un sommet si donné
   */
-  switch(typel) {
-  case 1 : // quadrangle 
+  switch(nbneel) {
+  case 4 : // quadrangle 
   /*  4  3
       1  2      */
     w[0]=1-x[0]-x[1]+x[0]*x[1];
     w[1]=x[0]*(1-x[1]);
     w[2]=x[0]*x[1];
     w[3]=x[1]*(1-x[0]);
-  break;
-  case 2 : // triangle 
+    break;
+  case 3 : // triangle 
   /*  3  
       1  2      */	
     w[0]=1-x[0]-x[1];
     w[1]=x[0];
     w[2]=x[1];
-  break;
-  case 3 : // segment
+    break;
+  case 2 : // segment
   /*  2  1    */			
     w[0]=x[0];
     w[1]=1-x[0];
-  break;
+    break;
   }
 }
 
-void numNaret(int typel, int aretNum, int ptsNum[]){
-  switch(typel){
-  case 1:
+void numNaret(int nbneel, int aretNum, int ptsNum[]){
+  switch(nbneel){
+  case 4 : // quadrangle
     switch(aretNum){
-    case 1:
+    case 1 :
       ptsNum[0] = 1;
       ptsNum[1] = 2;
-    break;
+      break;
     case 2:
       ptsNum[0] = 2;
       ptsNum[1] = 3;
-    break;
+      break;
     case 3:
       ptsNum[0] = 3;
       ptsNum[1] = 4;
-    break;
+      break;
     case 4:
       ptsNum[0] = 4;
       ptsNum[1] = 1;
-    break;
+      break;
     }
-  break;
-  case 2:
+    break;
+  case 3 : // triangle
     switch(aretNum){
     case 1:
       ptsNum[0] = 1;
       ptsNum[1] = 2;
-    break;
+      break;
     case 2:
       ptsNum[0] = 2;
       ptsNum[1] = 3;
-    break;
+      break;
     case 3:
       ptsNum[0] = 3;
       ptsNum[1] = 1;
-    break;
+      break;
     }
-  break;
+    break;
   }
 }
 
