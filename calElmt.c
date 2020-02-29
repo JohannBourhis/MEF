@@ -37,14 +37,14 @@ void ppquad(int nbneel, float *W, float **X){
   }
 }
 
-void invertM2x2(float **M, float *det, float **M_inv){
+void invertM2x2(float **M, float *detM, float **MInv){
   /* Calcul de l'inverse d'une matrice M et de son déterminant */
-  *det=M[0][0]*(M[1][1])-M[0][1]*(M[1][0]);
+  *detM=M[0][0]*(M[1][1])-M[0][1]*(M[1][0]);
   float alpha = (1./(*det));
-  M_inv[0][0]=alpha*M[1][1];
-  M_inv[0][1]=-alpha*M[0][1];
-  M_inv[1][0]=-alpha*M[1][0];
-  M_inv[1][1]=alpha*M[0][0];
+  MInv[0][0]=alpha*M[1][1];
+  MInv[0][1]=-alpha*M[0][1];
+  MInv[1][0]=-alpha*M[1][0];
+  MInv[1][1]=alpha*M[0][0];
 }
 
 void matJacob(int nbneel, int dimDom, float **JacFk, float **S, float **Dfoncbase){
