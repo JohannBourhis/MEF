@@ -23,6 +23,7 @@ Arguments de sortie :
  ------------------------------------------- */ 
 #include "maille.h"
 #include "calElmt.h"
+#include "int.h"
 
 int cal1Elem( int typel, int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArEl, 
   int nbRefD0, float *numRefD0, int nbRefD1, float *numRefD1, int nbRefF1, float *numRefF1, 
