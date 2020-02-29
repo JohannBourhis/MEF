@@ -1,5 +1,5 @@
 /*==============================================
-Arguments d'entrée :
+Arguments d'entrÃ©e :
 	int typel : le type d'élément
 	float **coorEl : les noeuds de l'element K
 	
@@ -11,6 +11,7 @@ Arguments de sortie :
 #include <math.h>
 #include "maille.h"
 #include "calElmt.h"
+#include "int.h"
 
 // changer transFK
 int intElem(int typel, float **coorEl, float *SMbrElm, float **MatElem){
@@ -34,7 +35,7 @@ int intElem(int typel, float **coorEl, float *SMbrElm, float **MatElem){
     n_quad=3;
   }
   else{
-    printf("Erreur dans le type transmis a�intElem");
+    printf("Erreur dans le type transmis a intElem");
     return 2;
   }
   cofvar_ADWDW=malloc(4*sizeof(float));
