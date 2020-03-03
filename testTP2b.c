@@ -21,7 +21,7 @@ int main(){
   float *uDElem=malloc(nbneel*sizeof(float));
 
   // Sommets
-  float **coorEl=allocrab(nbneel,2); 
+  float **coorEl=alloctabf(nbneel,2); 
   coorEl[0][0]=0; coorEl[0][1]=0;
   coorEl[1][0]=0; coorEl[1][1]=1;
   coorEl[2][0]=1; coorEl[2][1]=1;
@@ -34,6 +34,7 @@ int main(){
     int nbRefD0, float *numRefD0, int nbRefD1, float *numRefD1, int nbRefF1, float *numRefF1, 
       float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem)
     
+/*
 * Numeros de references a donner dans l'ordre :
 * 
 * nrefdm
@@ -49,3 +50,4 @@ int main(){
 * nured1 : tableau des numeros de reference Dirichlet non homogene
 * nbref1 : nombre de numeros de reference Neumann
 * nuref1 : tableau des numeros de reference Neumann
+*/
