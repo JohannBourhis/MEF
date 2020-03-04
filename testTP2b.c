@@ -1,12 +1,14 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include "maille.h"
 #include "calElmt.h"
 #include "int.h"
-
+ // gcc * -lm   pour utiliser math.h
 int main(){
-  int nbneel=4;
+  int typel=1;
   int nbaret=4;
+  int res;
+  int nbneel=4;
   int nRefDom=0;
   int nbRefD0=1;
   int numRefD0[nbRefD0];
@@ -33,23 +35,9 @@ int main(){
   int *nRefArEl=malloc(nbneel*sizeof(int));
   nRefArEl[0]=1;nRefArEl[1]=2;nRefArEl[2]=3;nRefArEl[3]=4;
 
-
-  int res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefArEl, nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
+  res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefArEl, nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
+  
+  printf("res = %d \n",res);
+  
+  impCalEl(1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem);
 }
-/*
-* Numeros de references a donner dans l'ordre :
-* 
-* nrefdm
-* nbred0, (nured0(i),i=1,nbred0)
-* nbred1, (nured1(i),i=1,nbred1)
-* nbref1, (nuref1(i),i=1,nbref1)
-* 
-* avec
-* nrefdm : numero de reference du domaine
-* nbred0 : nombre de numeros de reference Dirichlet homogene
-* nured0 : tableau des numeros de reference Dirichlet homogene
-* nbred1 : nombre de numeros de reference Dirichlet non homogene
-* nured1 : tableau des numeros de reference Dirichlet non homogene
-* nbref1 : nombre de numeros de reference Neumann
-* nuref1 : tableau des numeros de reference Neumann
-*/

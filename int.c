@@ -81,7 +81,7 @@ Arguments de sortie :
 	float* SMbrAret : les valeurs de l'intégrale de f*w_i sur K, pour tout i
 	float** MatAret : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
-int intAret(float **coorAr, int *numNoeuds, float *SMbrAret, float **MatAret){
+int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   int i, nbneel=2, nQuad=3;
   float L;
   float *Wq, **Xq;
@@ -100,7 +100,7 @@ int intAret(float **coorAr, int *numNoeuds, float *SMbrAret, float **MatAret){
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
   for(i=0; i<nQuad; i++){
-	printf(" %d \n",i);  // affichage
+	printf("inAret i %d \n",i);  // affichage
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
@@ -117,6 +117,7 @@ int intAret(float **coorAr, int *numNoeuds, float *SMbrAret, float **MatAret){
   free(Fk); free(Jac);
   free(Wq); free(Xq);
   free(fctbase); freetab(Derfctbase);
+  printf("End inAret\n");
   return 0;
 }
 
@@ -147,7 +148,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
   int i, j, k, l, nk, nl, R, numAr, condAr;
-  int numNoeuds[2]; float **coorAr;
+  int numNoeuds[2]; float *coorAr[2];
   
   // Mini-matrice pour les aretes
   float *SMbrAret, **MatAret;
@@ -177,10 +178,10 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     }
     // Dirichlet homogène
     for (j=0; j<nbRefD0; j++){
-      printf("D0 j= %d\n",j);   ///////
+	  printf("D0 j= %d\n",j);   ///////
       if (numRefD0[j]==condAr){  
 		printf(" d\n");
-        numNaret(nbneel, i+1, numNoeuds);    
+        numNaret(nbneel, i+1, numNoeuds);    //// erreur
         printf(" f\n");
         NuDElem[numNoeuds[0]]=1;
         NuDElem[numNoeuds[1]]=1;        
@@ -189,7 +190,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     }
     // Dirichlet non-homogène
     for(j=0; j<nbRefD1; j++){
-      printf("D1 j= %d\n",j);
+	  printf("D1 j= %d\n",j);
       if (numRefD1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds);  
         NuDElem[numNoeuds[0]]=-1;
@@ -200,23 +201,27 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
         break;
       }
     }
+    
     // Neumann ou Fourier     // num-noeuds decale les indices
     for(j=0; j<nbRefF1; j++){
-      printf("F1 j= %d\n",j);
+	  printf("F1 j= %d\n",j);
       if (numRefF1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds); 
         printf(" Neumann 1\n"); 
-        selectPts(2, numNoeuds, coorEl, coorAr);  ///// erreur
+        selectPts(2, numNoeuds, coorEl, coorAr); // erreur
         printf(" Neumann 2\n");
         //Calcul des intégrales linéiques 
         R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
+        printf("Neumann 3 \n");
         if(R){return R;}
-        for(k=0; k<nbneel; k++){
+        for(k=0; k<2; k++){  /// changement k<2
+		  printf("D0 k %d\n",k);
           nk = numNoeuds[k]-1;
           SMbrElem[nk] += SMbrAret[k];
           for(l=0; l<nbneel; l++){
             nl = numNoeuds[l]-1;
             MatElem[nk][nl]+=MatAret[k][l]; 
+            printf("MAtElem %f\n",MatAret[k][l]);
           }
         }
        break;
@@ -225,6 +230,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   }
   free(SMbrAret);
   freetab(MatAret);
+  printf("End cal1Elem \n");
   return 0;
 }
 
