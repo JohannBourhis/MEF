@@ -88,7 +88,6 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   float *fctbase, **Derfctbase;
   float *Fk, **Jac, eltdif; 
   float cofvarW, cofvarWW;
-  printf("a\n");
 
   Fk=malloc(2*sizeof(float)); if(Fk == NULL){return 1;}
   Jac=alloctabf(2,1); if(Jac == NULL){return 1;}
@@ -100,7 +99,7 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
   for(i=0; i<nQuad; i++){
-	printf("inAret i %d \n",i);  // affichage
+	printf("inAret i =%d \n",i);  // affichage
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
@@ -171,18 +170,16 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   
   //Prise en compte des conditions aux limites
   for (i=0; i<nbaret ; i++){   // (i+1) numéro local de l'arrete
-	printf("i=%d\n",i);
+	printf("cal1Elem i=%d\n",i);
     condAr=nRefArEl[i];
     if (condAr == nRefDom){
       continue; // on passe au i suivant 
     }
     // Dirichlet homogène
     for (j=0; j<nbRefD0; j++){
-	  printf("D0 j= %d\n",j);   ///////
+	  printf("D0 j= %d\n",j); 
       if (numRefD0[j]==condAr){  
-		printf(" d\n");
-        numNaret(nbneel, i+1, numNoeuds);    //// erreur
-        printf(" f\n");
+        numNaret(nbneel, i+1, numNoeuds);
         NuDElem[numNoeuds[0]]=1;
         NuDElem[numNoeuds[1]]=1;        
         break;
@@ -207,21 +204,18 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
 	  printf("F1 j= %d\n",j);
       if (numRefF1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds); 
-        printf(" Neumann 1\n"); 
-        selectPts(2, numNoeuds, coorEl, coorAr); // erreur
-        printf(" Neumann 2\n");
+        selectPts(2, numNoeuds, coorEl, coorAr);
         //Calcul des intégrales linéiques 
         R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
-        printf("Neumann 3 \n");
         if(R){return R;}
         for(k=0; k<2; k++){  /// changement k<2
-		  printf("D0 k %d\n",k);
+		  printf("F1 k= %d\n",k);
           nk = numNoeuds[k]-1;
           SMbrElem[nk] += SMbrAret[k];
           for(l=0; l<nbneel; l++){
             nl = numNoeuds[l]-1;
             MatElem[nk][nl]+=MatAret[k][l]; 
-            printf("MAtElem %f\n",MatAret[k][l]);
+            printf("MAtAret %f\n",MatAret[k][l]);
           }
         }
        break;
