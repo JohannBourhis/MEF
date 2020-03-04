@@ -1,9 +1,9 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h> // -lm lors de l'édition de lien
+#include <math.h>
 #include "maille.h"
 #include "calElmt.h"
 #include "int.h"
+#include <stdlib.h>
+#include <stdio.h>
 #define EPS 10e-6 //sensibilité pour l'inversibilité de la Jacobienne
 
 /*==============================================
@@ -43,15 +43,15 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
   Derfctbase=alloctabf(nbneel,2); if(Derfctbase==NULL){return 1;}
   // Calcul des points de quadrature de l'élément de référence
   ppquad(nbneel, Wq, Xq);
-  for(i=0 ; i<nQuad ; i++){
+  for(i=0; i<nQuad; i++){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     transFk(nbneel, coorEl, fctbase, Fk); // Fk : valeur de Fk en xq[i]
     matJacob(nbneel, 2, Jac, coorEl, Derfctbase);
     invertM2x2(Jac, &detJac, InvJac);
-    detJac=fabsf(detJac);
+    detJac = fabsf(detJac);
     if(detJac < eps){
-      printf("Matrice singuliere");
+      printf("Matrice singuliere \n");
       return 3;
     }
     eltdif=detJac*Wq[i];
@@ -59,6 +59,7 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
     cofvarWW=A00(Fk);
     cofvarADWDW[0]=A11(Fk); cofvarADWDW[1]=A12(Fk); 
     cofvarADWDW[2]=A21(Fk); cofvarADWDW[3]=A22(Fk);
+    
     // Calcul des integrales
     W(nbneel, fctbase, eltdif, cofvarW, SMbrElm);
     WW(nbneel, fctbase, eltdif, cofvarWW, MatElem);
@@ -80,11 +81,12 @@ Arguments de sortie :
 	float* SMbrAret : les valeurs de l'intégrale de f*w_i sur K, pour tout i
 	float** MatAret : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
-int intAret(float **coorAr, int *numNoeuds, float* SMbrAret, float **MatAret){
+int intAret(float **coorAr, int *numNoeuds, float *SMbrAret, float **MatAret){
   int i, nbneel=2, nQuad=3;
+  float L;
   float *Wq, **Xq;
   float *fctbase, **Derfctbase;
-  float L, *Fk, **Jac, eltdif; 
+  float *Fk, **Jac, eltdif; 
   float cofvarW, cofvarWW;
 
   Fk=malloc(2*sizeof(float)); if(Fk == NULL){return 1;}
@@ -124,7 +126,7 @@ Arguments d'entrée :
   nbaret   : nombre d'aretes de l'element
   coorEl   : tableau contenant les sommets de l'element courant K (à initialiser avec la fct selectPts à partir du fichier maillage)
   nRefArEl : tableau contenant les num de ref des nbaret de l'element
-             float *nRefAr[nbaret]
+             int *nRefAr[nbaret]
   nRefDom  : etiquette coorespondant aux aretes internes
   nbRefD0  : taille de numRefD0
   numRefDO : numéro locaux des arretes coorespondant a une condition de Dirichlet  u=O
@@ -140,11 +142,10 @@ Arguments de sortie :
  ------------------------------------------- */ 
 int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl, 
   int nbRefD0, int *numRefD0, int nbRefD1, int *numRefD1, int nbRefF1, int *numRefF1, 
-    float **MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
+    float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
   int i, j, k, l, nk, nl, R, numAr, condAr;
-  int *numNoeuds;
-  float **coorAr;
+  int *numNoeuds; float **coorAr;
   
   // Mini-matrice pour les aretes
   float *SMbrAret, **MatAret;
@@ -163,7 +164,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   
   //Calcul des intégrales surfaciques
   R = intElem(nbneel, coorEl, SMbrElem, MatElem);
-  if(R){return R;}
+  if(R){return R;};
   
   //Prise en compte des conditions aux limites
   for (i=0; i<nbaret ; i++){   // (i+1) numéro local de l'arrete
