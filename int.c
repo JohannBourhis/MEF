@@ -177,10 +177,10 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     }
     // Dirichlet homogène
     for (j=0; j<nbRefD0; j++){
-	  printf("D0 j= %d\n",j);   ///////
+      printf("D0 j= %d\n",j);   ///////
       if (numRefD0[j]==condAr){  
 		printf(" d\n");
-        numNaret(nbneel, i+1, numNoeuds);    //// erreur
+        numNaret(nbneel, i+1, numNoeuds);    
         printf(" f\n");
         NuDElem[numNoeuds[0]]=1;
         NuDElem[numNoeuds[1]]=1;        
@@ -189,7 +189,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     }
     // Dirichlet non-homogène
     for(j=0; j<nbRefD1; j++){
-	  printf("D1 j= %d\n",j);
+      printf("D1 j= %d\n",j);
       if (numRefD1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds);  
         NuDElem[numNoeuds[0]]=-1;
@@ -202,11 +202,11 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     }
     // Neumann ou Fourier     // num-noeuds decale les indices
     for(j=0; j<nbRefF1; j++){
-	  printf("F1 j= %d\n",j);
+      printf("F1 j= %d\n",j);
       if (numRefF1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds); 
         printf(" Neumann 1\n"); 
-        selectPts(2, numNoeuds, coorEl, coorAr); // erreur
+        selectPts(2, numNoeuds, coorEl, coorAr);  ///// erreur
         printf(" Neumann 2\n");
         //Calcul des intégrales linéiques 
         R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
