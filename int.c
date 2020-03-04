@@ -145,7 +145,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
   int i, j, k, l, nk, nl, R, numAr, condAr;
-  int *numNoeuds; float **coorAr;
+  int numNoeuds[]; float **coorAr;
   
   // Mini-matrice pour les aretes
   float *SMbrAret, **MatAret;
