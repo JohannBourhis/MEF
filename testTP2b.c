@@ -32,7 +32,7 @@ int main(){
 
   int cal1Elem(nbneel, nRefDom, float **coorEl, float *nRefArEl, 
     int nbRefD0, float *numRefD0, int nbRefD1, float *numRefD1, int nbRefF1, float *numRefF1, 
-      float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem)
+      float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem);
     
 /*
 * Numeros de references a donner dans l'ordre :
