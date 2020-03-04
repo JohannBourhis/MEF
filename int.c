@@ -1,4 +1,6 @@
-#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h> // -lm lors de l'édition de lien
 #include "maille.h"
 #include "calElmt.h"
 #include "int.h"
@@ -14,11 +16,11 @@ Arguments de sortie :
 	float* SmbreElm : Les éléments du second membre, pour tout i
 ===============================================*/
 int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
-  int i, j, k, nbneel, nQuad;
+  int i, j, k, nQuad;
   float *Wq, **Xq, *fctbase, **Derfctbase;
   float *Fk, **Jac, detJac, **InvJac, eltdif;
   float cofvarW, cofvarWW, *cofvarADWDW;
-  float eps=EPS
+  float eps=EPS;
   switch(nbneel){
     case 4 :
       nQuad=9;
@@ -44,12 +46,12 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
   for(i=0 ; i<nQuad ; i++){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
-    transFK(nbneel, coorEl, fctbase, Fk); // Fk : valeur de Fk en xq[i]
+    transFk(nbneel, coorEl, fctbase, Fk); // Fk : valeur de Fk en xq[i]
     matJacob(nbneel, 2, Jac, coorEl, Derfctbase);
-    invertM2x2(Jac, detJac, InvJac);
-    detJac = fabsf(detJac)
-    if(detJac < 10e-6){
-      printf("Matrice singuliere")
+    invertM2x2(Jac, &detJac, InvJac);
+    detJac=fabsf(detJac);
+    if(detJac < eps){
+      printf("Matrice singuliere");
       return 3;
     }
     eltdif=detJac*Wq[i];
@@ -58,8 +60,8 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
     cofvarADWDW[0]=A11(Fk); cofvarADWDW[1]=A12(Fk); 
     cofvarADWDW[2]=A21(Fk); cofvarADWDW[3]=A22(Fk);
     // Calcul des integrales
-    W(nbneel, fctbas, eltdif, cofvarW, SMbrElm);
-    WW(nbneel, fctbas, eltdif, cofvarWW, MatElem);
+    W(nbneel, fctbase, eltdif, cofvarW, SMbrElm);
+    WW(nbneel, fctbase, eltdif, cofvarWW, MatElem);
     ADWDW(nbneel, Derfctbase, InvJac, eltdif, cofvarADWDW, MatElem);
   }
   free(cofvarADWDW); free(Fk);
@@ -78,19 +80,19 @@ Arguments de sortie :
 	float* SMbrAret : les valeurs de l'intégrale de f*w_i sur K, pour tout i
 	float** MatAret : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
-int intAret(float **coorAR, int *numNoeuds, float* SMbrAret, float **MatAret){
+int intAret(float **coorAr, int *numNoeuds, float* SMbrAret, float **MatAret){
   int i, nbneel=2, nQuad=3;
-  float *Wq, *Xq;
+  float *Wq, **Xq;
   float *fctbase, **Derfctbase;
-  float *Fk, **Jac, eltdif; 
+  float L, *Fk, **Jac, eltdif; 
   float cofvarW, cofvarWW;
 
   Fk=malloc(2*sizeof(float)); if(Fk == NULL){return 1;}
   Jac=alloctabf(2,1); if(Jac == NULL){return 1;}
   Wq=malloc(nQuad*sizeof(float)); if(Wq == NULL){return 1;} // points et poids de quadrature
-  Xq=malloc(nQuad*sizeof(float));  if(Xq == NULL){return 1;} // sur les aretes les points de quadrature sont des reels
+  Xq=alloctabf(nQuad,1);  if(Xq == NULL){return 1;} // sur les aretes les points de quadrature sont des reels
   fctbase=malloc(nbneel*sizeof(float)); if(fctbase == NULL){return 1;}
-  Derfctbase=allocatbf(nbneel,1); if(Derfctbase == NULL){return 1;}
+  Derfctbase=alloctabf(nbneel,1); if(Derfctbase == NULL){return 1;}
 
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
@@ -98,8 +100,8 @@ int intAret(float **coorAR, int *numNoeuds, float* SMbrAret, float **MatAret){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
-    Fk[0]=Xq[i]*(coorAr[0][0]-coorAr[1][0])+coorAr[0][0];   // coorAr[0][0]-coorAr[1][0]=Jac[0]
-    Fk[1]=Xq[i]*(coorAr[0][1]-coorAr[1][1])+coorAr[0][1];   // Jac[1]
+    Fk[0]=Xq[i][0]*(coorAr[0][0]-coorAr[1][0])+coorAr[0][0];   // coorAr[0][0]-coorAr[1][0]=Jac[0]
+    Fk[1]=Xq[i][0]*(coorAr[0][1]-coorAr[1][1])+coorAr[0][1];   // Jac[1]
     L=sqrt(Jac[0][0]*Jac[0][0] + Jac[1][0]*Jac[1][0]);	
     eltdif=L*Wq[i];
     cofvarW=FN(Fk);
@@ -136,15 +138,16 @@ Arguments de sortie :
   NuDElem  : noeuds qui ont la condition de dirichlet (0, 1, ou -1)
   uDElem   : valeur de la condition de dirichlet
  ------------------------------------------- */ 
-int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArEl, 
-  int nbRefD0, float *numRefD0, int nbRefD1, float *numRefD1, int nbRefF1, float *numRefF1, 
-    float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
+int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl, 
+  int nbRefD0, int *numRefD0, int nbRefD1, int *numRefD1, int nbRefF1, int *numRefF1, 
+    float **MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
   int i, j, k, l, nk, nl, R, numAr, condAr;
-  int *numNoeuds, float *coorAr;
+  int *numNoeuds;
+  float **coorAr;
   
   // Mini-matrice pour les aretes
-  float SMbrAret, MatAret;
+  float *SMbrAret, **MatAret;
   SMbrAret = malloc(2*sizeof(float)); if(SMbrAret == NULL){return 1;}
   MatAret = alloctabf(2,2); if(MatAret == NULL){return 1;}
   
@@ -160,7 +163,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
   
   //Calcul des intégrales surfaciques
   R = intElem(nbneel, coorEl, SMbrElem, MatElem);
-  if(R){return R};
+  if(R){return R;}
   
   //Prise en compte des conditions aux limites
   for (i=0; i<nbaret ; i++){   // (i+1) numéro local de l'arrete
@@ -195,7 +198,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
         numNaret(nbneel, i+1, numNoeuds);  
         selectPts(2,numNoeuds, coorEl, coorAr);
         //Calcul des intégrales linéiques 
-        R = intAret(coorAr, SMbrAret, MatAret) 
+        R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
         if(R){return R;}
         for(k=0; k<nbneel; k++){
           nk = numNoeuds[k]-1;
@@ -209,8 +212,8 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, float *nRefArE
       }
     }
   }
-  free(SMbrAret)
-  freetab(MatAret)
+  free(SMbrAret);
+  freetab(MatAret);
   return 0;
 }
 
@@ -318,13 +321,13 @@ void ADWDW(int nbneel, float **Derfctbas, float **InvJac, float eltdif, float *c
   int i,j;
   float coeff0, coeff1, Derfct0, Derfct1;
   for(i=0; i<nbneel; i++){
-    Derfct0=Derfctbas[0,i]*InvJac[0,0] + Derfctbas[1,i]*InvJac[0,1]; 
-    Derfct1=Derfctbas[0,i]*InvJac[1,0] + Derfctbas[1,i]*InvJac[1,1];
+    Derfct0=Derfctbas[0][i]*InvJac[0][0] + Derfctbas[1][i]*InvJac[0][1]; 
+    Derfct1=Derfctbas[0][i]*InvJac[1][0] + Derfctbas[1][i]*InvJac[1][1];
     coeff0=eltdif*(cofvar[0]*Derfct0 + cofvar[2]*Derfct1); // JFk*(a_11*dwi/dx1 + a_21*dwi/dx2) 
     coeff1=eltdif*(cofvar[1]*Derfct0 + cofvar[3]*Derfct1); // JFk*(a_12*dwi/dx1 + a_22*dwi/dx2) 
     for(j=0;j<nbneel;j++){
-      matelm[i][j]=matelm[i][j] + coeff0*(Derfctbas[0,j]*InvJac[0,0] + Derfctbas[1,j]*InvJac[0,1]) + 
-	      coeff1*(Derfctbas[0,i]*InvJac[1,0] + Derfctbas[1,i]*InvJac[1,1]);
+      matelm[i][j]=matelm[i][j] + coeff0*(Derfctbas[0][j]*InvJac[0][0] + Derfctbas[1][j]*InvJac[0][1]) + 
+	      coeff1*(Derfctbas[0][i]*InvJac[1][0] + Derfctbas[1][i]*InvJac[1][1]);
       // on somme sur les != points de quad grâce aux appels de la fonction
     }
   }

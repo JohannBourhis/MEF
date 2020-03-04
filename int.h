@@ -1,8 +1,8 @@
 int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem);
-int intAret(float **coorAR, float* I_w, float **I_ww);
+int intAret(float **coorAr, int *numNoeuds, float* SMbrAret, float **MatAret);
 int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, 
-  float *nRefArEl, int nbRefD0, float *numRefDO, int nbRefD1, float *numRefD1, 
-    int nbRefF1, float *numRefF1, float ** MatElem, float *SMbrElem, int *NuDElem, 
+  int *nRefArEl, int nbRefD0, int *numRefDO, int nbRefD1, int *numRefD1, 
+    int nbRefF1, int *numRefF1, float ** MatElem, float *SMbrElem, int *NuDElem, 
       float *uDElem);
 
 // fonctions

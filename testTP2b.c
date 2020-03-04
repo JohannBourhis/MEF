@@ -1,13 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include "maille.h"
 #include "calElmt.h"
 #include "int.h"
 
 int main(){
   int nbneel=4;
+  int nbaret=4;
   int nRefDom=0;
   int nbRefD0=1;
-  int numReD0[nbRefD0];
-  numReD0[0]=1;
+  int numRefD0[nbRefD0];
+  numRefD0[0]=1;
   int nbRefD1=1;
   int numRefD1[nbRefD1];
   numRefD1[0]=4;
@@ -30,10 +33,8 @@ int main(){
   int *nRefArEl=malloc(nbneel*sizeof(int));
   nRefArEl[0]=1;nRefArEl[1]=2;nRefArEl[2]=3;nRefArEl[3]=4;
 
-  int cal1Elem(nbneel, nRefDom, float **coorEl, float *nRefArEl, 
-    int nbRefD0, float *numRefD0, int nbRefD1, float *numRefD1, int nbRefF1, float *numRefF1, 
-      float ** MatElem, float *SMbrElem, int *NuDElem, float *uDElem);
 
+  int res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefArEl, nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
 }
 /*
 * Numeros de references a donner dans l'ordre :

@@ -40,7 +40,7 @@ void ppquad(int nbneel, float *W, float **X){
 void invertM2x2(float **M, float *detM, float **MInv){
   /* Calcul de l'inverse d'une matrice M et de son déterminant */
   *detM=M[0][0]*(M[1][1])-M[0][1]*(M[1][0]);
-  float alpha = (1./(*det));
+  float alpha = (1./(*detM));
   MInv[0][0]=alpha*M[1][1];
   MInv[0][1]=-alpha*M[0][1];
   MInv[1][0]=-alpha*M[1][0];
@@ -195,4 +195,3 @@ int main(){
   free(W);
   freetab(X);
   */
-}
