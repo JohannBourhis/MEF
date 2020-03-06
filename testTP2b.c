@@ -9,19 +9,19 @@ int main(){
   int nbaret;
   int nbneel;
   int res;
+  int nbtng;
+  int ntel; 
+  float **coord;
+  int **ngnel;
+  int **nRefAr;
+   
+  char *ficmai = "car1x1t_1";
+
+  lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel, &nbneel, &nbaret, &nRefAr);
   
-    char *ficmai = "car1x1t_1";
+  float **coorEl = alloctabf(nbneel,2);
 
-
-	int nbtng;
-	int ntel; 
-    float **coord;
-	int **ngnel;
-	int **nRefAr;
-
-	lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel, &nbneel, &nbaret, &nRefAr);
-    float **coorEl = alloctabf(nbneel,2);
-  
+// Numero des ref des aretes
   int *nRefArEl=malloc(nbneel*sizeof(int));
   int nRefDom=0;
   // Dirichlet
@@ -43,19 +43,16 @@ int main(){
   int *NuDElem=malloc(nbneel*sizeof(int));
   float *uDElem=malloc(nbneel*sizeof(float));
   
-
-  
-
+// Boucle sur les elements
   for(int i=0;i<ntel;i++){
-	for(int j=0;j<nbneel;j++){
-		coorEl[j][0]=coord[ngnel[i][j]-1][0];
-		coorEl[j][1]=coord[ngnel[i][j]-1][1];
-		nRefArEl[j]=nRefAr[i][j];
+    for(int j=0;j<nbneel;j++){
+      coorEl[j][0]=coord[ngnel[i][j]-1][0];
+      coorEl[j][1]=coord[ngnel[i][j]-1][1];
+      nRefArEl[j]=nRefAr[i][j];
     }
-    
-    res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefArEl, nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
+  res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefArEl, nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
   printf("res = %d \n",res);
   
-  impCalEl(1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem);
-}
+  impCalEl(i+1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem);
+  }
 }
