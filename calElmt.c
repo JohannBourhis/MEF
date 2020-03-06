@@ -23,7 +23,7 @@ void ppquad(int nbneel, float *W, float **X){
       X[8][0]=1./2; X[8][1]=1./2;
       break;
     case 3 :
-      for(int i=0; i<2; i++){
+      for(int i=0; i<3; i++){
         W[i]=1./6;
       }
       X[0][0]=1./2; X[0][1]=1./2;
@@ -37,10 +37,10 @@ void ppquad(int nbneel, float *W, float **X){
   }
 }
 
-void invertM2x2(float **M, float *detM, float **MInv){
+void invertM2x2(float **M, float *det, float **MInv){
   /* Calcul de l'inverse d'une matrice M et de son déterminant */
-  *detM=M[0][0]*(M[1][1])-M[0][1]*(M[1][0]);
-  float alpha = (1./(*detM));
+  *det=M[0][0]*(M[1][1])-M[0][1]*(M[1][0]);
+  float alpha = (1./(*det));
   MInv[0][0]=alpha*M[1][1];
   MInv[0][1]=-alpha*M[0][1];
   MInv[1][0]=-alpha*M[1][0];
@@ -85,8 +85,8 @@ void calDerFbase(int nbneel, float *x, float **w){
         1  2 */
     w[0][0]=-1+x[1]; w[0][1]=-1+x[0]; 
     w[1][0]=1-x[1];  w[1][1]=-x[0];
-    w[2][0]=-x[1];   w[2][1]=1-x[0];
-    w[3][0]=x[1];    w[3][1]=x[0];
+    w[2][0]=x[1];   w[2][1]=x[0];
+    w[3][0]=-x[1];    w[3][1]=1-x[0];
     break;
   case 3 : // triangle 	
     w[0][0]=-1; w[0][1]=-1; 
@@ -177,21 +177,3 @@ void selectPts(int nb, int num[], float *coorEns[], float *coorSel[]){
     coorSel[i] = coorEns[num[i]-1];
   }
 }
-
-
-/* test de ppquad */
-/*
-int main(){
-  int t=2;
-  float *W;
-  float **X;
-  W = malloc(3*sizeof(float));
-  X=alloctabf(3,2);
-  ppquad(t,W,X);
-  for(int i=0;i<3;i++){
-    float*x = X[i];
-    printf("%f,%f\n",x[0],x[1]);
-  }
-  free(W);
-  freetab(X);
-  */

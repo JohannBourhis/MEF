@@ -46,7 +46,7 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
   for(i=0; i<nQuad; i++){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
-    transFk(nbneel, coorEl, fctbase, Fk); // Fk : valeur de Fk en xq[i]
+    transFk(nbneel, coorEl, Fk, fctbase); // Fk : valeur de Fk en xq[i]
     matJacob(nbneel, 2, Jac, coorEl, Derfctbase);
     invertM2x2(Jac, &detJac, InvJac);
     detJac = fabsf(detJac);
@@ -99,7 +99,6 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
   for(i=0; i<nQuad; i++){
-	printf("inAret i =%d \n",i);  // affichage
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
@@ -153,10 +152,9 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   float *SMbrAret, **MatAret;
   SMbrAret = malloc(2*sizeof(float)); if(SMbrAret == NULL){return 1;}
   MatAret = alloctabf(2,2); if(MatAret == NULL){return 1;}
-  
   //Initialisations de NuDElem, uDElem, SMbrElem et MatElem
   for(i=0; i<nbneel; i++){
-    NuDElem[i]=0;
+    NuDElem[i]=1;
     uDElem[i]=0;
     SMbrElem[i]=0;
     for(j=0; j<nbneel; j++){
@@ -167,41 +165,36 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   //Calcul des intégrales surfaciques
   R = intElem(nbneel, coorEl, SMbrElem, MatElem);
   if(R){return R;};
-  
   //Prise en compte des conditions aux limites
   for (i=0; i<nbaret ; i++){   // (i+1) numéro local de l'arrete
-	printf("cal1Elem i=%d\n",i);
     condAr=nRefArEl[i];
     if (condAr == nRefDom){
       continue; // on passe au i suivant 
     }
     // Dirichlet homogène
     for (j=0; j<nbRefD0; j++){
-	  printf("D0 j= %d\n",j); 
       if (numRefD0[j]==condAr){  
         numNaret(nbneel, i+1, numNoeuds);
-        NuDElem[numNoeuds[0]]=1;
-        NuDElem[numNoeuds[1]]=1;        
+        NuDElem[numNoeuds[0]-1]=0;
+        NuDElem[numNoeuds[1]-1]=0;        
         break;
       }
     }
     // Dirichlet non-homogène
     for(j=0; j<nbRefD1; j++){
-	  printf("D1 j= %d\n",j);
       if (numRefD1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds);  
-        NuDElem[numNoeuds[0]]=-1;
-        NuDElem[numNoeuds[1]]=-1;
+        NuDElem[numNoeuds[0]-1]=-1;
+        NuDElem[numNoeuds[1]-1]=-1;
         selectPts(2,numNoeuds, coorEl, coorAr);
-        uDElem[numNoeuds[0]]=UD(coorAr[0]);
-        uDElem[numNoeuds[1]]=UD(coorAr[1]);
+        uDElem[numNoeuds[0]-1]=UD(coorAr[0]);
+        uDElem[numNoeuds[1]-1]=UD(coorAr[1]);
         break;
       }
     }
     
     // Neumann ou Fourier     // num-noeuds decale les indices
     for(j=0; j<nbRefF1; j++){
-	  printf("F1 j= %d\n",j);
       if (numRefF1[j]==condAr) {  
         numNaret(nbneel, i+1, numNoeuds); 
         selectPts(2, numNoeuds, coorEl, coorAr);
@@ -209,13 +202,11 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
         R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
         if(R){return R;}
         for(k=0; k<2; k++){  /// changement k<2
-		  printf("F1 k= %d\n",k);
           nk = numNoeuds[k]-1;
           SMbrElem[nk] += SMbrAret[k];
           for(l=0; l<nbneel; l++){
             nl = numNoeuds[l]-1;
             MatElem[nk][nl]+=MatAret[k][l]; 
-            printf("MAtAret %f\n",MatAret[k][l]);
           }
         }
        break;
@@ -224,7 +215,6 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   }
   free(SMbrAret);
   freetab(MatAret);
-  printf("End cal1Elem \n");
   return 0;
 }
 
@@ -242,7 +232,7 @@ float A21(float *x){
   return 0.0;
 }
 float A00(float *x){
-  return 1.0;
+  return 0.0;
 }
 float BN(float *x){
   return 0.0;
@@ -251,7 +241,7 @@ float FOMEGA(float *x){
   return 1.0;
 }
 float FN(float *x){
-  return 1.0;
+  return 0.0;
 }
 float UD(float *x){
   return 100*x[0]+x[1];
@@ -278,7 +268,6 @@ void W(int nbneel, float *fctbas, float eltdif, float cofvar, float *vectelm){
   int i;
   for(i=0 ; i<nbneel ; i++){
     vectelm[i] = vectelm[i] + eltdif*cofvar*fctbas[i];
-    // on somme sur les points de quad a  chaque appel de la fonction
   }
 }
 
@@ -310,7 +299,7 @@ void WW(int nbneel, float *fctbas, float eltdif, float cofvar, float **matelm){
 }
 
 /*--------------------------------------
-ON CALCULE UN LA QUADRATURE POUR UN POINT DE LA QUADARTURE xq
+ON CALCULE LA QUADRATURE POUR UN POINT DE LA QUADARTURE xq
 C'EST UN ELEMENT DE LA SOMME
 Arguments d'entrée :
   nbneel : nombre de noeuds de l'element
@@ -332,13 +321,13 @@ void ADWDW(int nbneel, float **Derfctbas, float **InvJac, float eltdif, float *c
   int i,j;
   float coeff0, coeff1, Derfct0, Derfct1;
   for(i=0; i<nbneel; i++){
-    Derfct0=Derfctbas[0][i]*InvJac[0][0] + Derfctbas[1][i]*InvJac[0][1]; 
-    Derfct1=Derfctbas[0][i]*InvJac[1][0] + Derfctbas[1][i]*InvJac[1][1];
+    Derfct0=Derfctbas[i][0]*InvJac[0][0] + Derfctbas[i][1]*InvJac[1][0]; 
+    Derfct1=Derfctbas[i][0]*InvJac[0][1] + Derfctbas[i][1]*InvJac[1][1];
     coeff0=eltdif*(cofvar[0]*Derfct0 + cofvar[2]*Derfct1); // JFk*(a_11*dwi/dx1 + a_21*dwi/dx2) 
     coeff1=eltdif*(cofvar[1]*Derfct0 + cofvar[3]*Derfct1); // JFk*(a_12*dwi/dx1 + a_22*dwi/dx2) 
     for(j=0;j<nbneel;j++){
-      matelm[i][j]=matelm[i][j] + coeff0*(Derfctbas[0][j]*InvJac[0][0] + Derfctbas[1][j]*InvJac[0][1]) + 
-	      coeff1*(Derfctbas[0][i]*InvJac[1][0] + Derfctbas[1][i]*InvJac[1][1]);
+      matelm[i][j]=matelm[i][j] + coeff0*(Derfctbas[j][0]*InvJac[0][0] + Derfctbas[j][1]*InvJac[1][0]) + 
+	      coeff1*(Derfctbas[i][0]*InvJac[0][1] + Derfctbas[i][1]*InvJac[1][1]);
       // on somme sur les != points de quad grâce aux appels de la fonction
     }
   }
