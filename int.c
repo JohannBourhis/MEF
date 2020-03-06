@@ -204,7 +204,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
         for(k=0; k<2; k++){  /// changement k<2
           nk = numNoeuds[k]-1;
           SMbrElem[nk] += SMbrAret[k];
-          for(l=0; l<nbneel; l++){
+          for(l=0; l<2; l++){  /// changement k<2
             nl = numNoeuds[l]-1;
             MatElem[nk][nl]+=MatAret[k][l]; 
           }
