@@ -22,38 +22,38 @@ void etiqAr(int typel, int n1, int n2, int nrefdom, const int *nrefcot, int nbte
     case 1 :
       /* lower side */
       for(int i = 0; i < N; i+=typel){
-        nRefAr[i][0] = nrefcot[0];
+        nRefAr[i][3] = nrefcot[0];
       }
       /* right side */
       for(int i = N-1; i < NM; i+=N){	     
-        nRefAr[i][1] = nrefcot[1];
+        nRefAr[i][0] = nrefcot[1];
       }
       
       /* upper side */
       for(int i = M*(n1-2)*typel; i < NM; i+=typel){
-        nRefAr[i][2] = nrefcot[2];
-      }
-      /* left side */
-      for(int i = 0; i < NM; i+=N){
-        nRefAr[i][3] = nrefcot[3];
-      }
-    break;
-    case 2 :
-      /* lower side */
-      for(int i = 0; i < N; i+=typel){
-        nRefAr[i][0] = nrefcot[0];
-      }
-      /* right side */
-      for(int i = N - 1; i < NM; i+=N){	     
-        nRefAr[i][2] = nrefcot[1];
-      }
-      /* upper side */
-      for(int i = M*(n1-2)*typel + 1; i < NM; i+=typel){
         nRefAr[i][1] = nrefcot[2];
       }
       /* left side */
       for(int i = 0; i < NM; i+=N){
         nRefAr[i][2] = nrefcot[3];
+      }
+    break;
+    case 2 :
+      /* lower side */
+      for(int i = 0; i < N; i+=typel){
+        nRefAr[i][2] = nrefcot[0];
+      }
+      /* right side */
+      for(int i = N - 1; i < NM; i+=N){	     
+        nRefAr[i][1] = nrefcot[1];
+      }
+      /* upper side */
+      for(int i = M*(n1-2)*typel + 1; i < NM; i+=typel){
+        nRefAr[i][2] = nrefcot[2];
+      }
+      /* left side */
+      for(int i = 0; i < NM; i+=N){
+        nRefAr[i][1] = nrefcot[3];
       }
     break;
   }
