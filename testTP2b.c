@@ -28,7 +28,6 @@ int main(){
   int nbRefD0=1;
   int numRefD0[nbRefD0];
   numRefD0[0]=1;
-  //numRefD0[1]=3;
   // Dirichlet non-homogène
   int nbRefD1=1;
   int numRefD1[nbRefD1];
