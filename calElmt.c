@@ -62,13 +62,13 @@ void matJacob(int nbneel, int dimDom, float **JacFk, float **S, float **Dfoncbas
   }      
 }
 
-void transFk(int nbneel, float **S, float Y[], float *foncbase){
-  /* Calcul de Y, l'image par la transformation Fk à partir des sommets S
+void transFk(int nbneel, float **S, float Fk[], float *foncbase){
+  /* Calcul de l'image par la transformation Fk à partir des sommets S
   et des valeurs foncbase fournies par calFbase */
   for(int j=0;j<2;j++){
-    Y[j] = 0;
+    Fk[j] = 0;
     for(int i=0; i<nbneel; i++){ 
-      Y[j] += foncbase[i]*S[i][j];
+      Fk[j] += foncbase[i]*S[i][j];
     }
   }
 }
@@ -96,7 +96,7 @@ void calDerFbase(int nbneel, float *x, float **w){
   case 2 : // segment
     /*  2  1    */		
     w[0][0]=1;
-    w[0][1]=-1;
+    w[1][0]=-1;
     break;
   }
 }

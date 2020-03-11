@@ -17,9 +17,8 @@ Arguments de sortie :
 ===============================================*/
 int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
   int i, j, k, nQuad;
-  float *Wq, **Xq, *fctbase, **Derfctbase;
-  float *Fk, **Jac, detJac, **InvJac, eltdif;
-  float cofvarW, cofvarWW, **cofvarADWDW;
+  float detJac, eltdif;
+  float cofvarW, cofvarWW;
   float eps=EPS;
   switch(nbneel){
     case 4 :
@@ -33,14 +32,14 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
       return 2;
       break;
   }
-  cofvarADWDW=alloctabf(2,2);
-  Fk=malloc(2*sizeof(float)); if(Fk==NULL){return 1;}
-  Jac=alloctabf(2,2); if(Jac==NULL){return 1;}
-  InvJac=alloctabf(2,2); if(InvJac==NULL){return 1;}
-  Wq=malloc(nQuad*sizeof(float)); if(Wq==NULL){return 1;} // points et poids de quadrature
-  Xq=alloctabf(nQuad,2); if(Xq==NULL){return 1;}
-  fctbase=malloc(nbneel*sizeof(float)); if(fctbase==NULL){return 1;}
-  Derfctbase=alloctabf(nbneel,2); if(Derfctbase==NULL){return 1;}
+  float Wq[nQuad];
+  float **Xq=alloctabf(nQuad,2); if(Xq==NULL){return 1;};
+  float fctbase[nbneel];
+  float **Derfctbase=alloctabf(nbneel,2); if(Derfctbase==NULL){return 1;};
+  float **cofvarADWDW=alloctabf(2,2); if(cofvarADWDW==NULL){return 1;};
+  float Fk[2];
+  float **Jac=alloctabf(2,2); if(Jac==NULL){return 1;};
+  float **InvJac=alloctabf(2,2); if(InvJac==NULL){return 1;};
   // Calcul des points de quadrature de l'élément de référence
   ppquad(nbneel, Wq, Xq);
   for(i=0; i<nQuad; i++){
@@ -65,10 +64,9 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
     WW(nbneel, fctbase, eltdif, cofvarWW, MatElem);
     ADWDW(nbneel, Derfctbase, InvJac, eltdif, cofvarADWDW, MatElem);
   }
-  free(cofvarADWDW); free(Fk);
   freetab(Jac); freetab(InvJac);
-  free(Wq); freetab(Xq);
-  free(fctbase); freetab(Derfctbase);
+  freetab(Xq); freetab(cofvarADWDW);
+  freetab(Derfctbase);
   return 0;
 }
 
@@ -83,18 +81,15 @@ Arguments de sortie :
 ===============================================*/
 int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   int i, nbneel=2, nQuad=3;
-  float L;
-  float *Wq, **Xq;
-  float *fctbase, **Derfctbase;
-  float *Fk, **Jac, eltdif; 
+  float L, eltdif; 
   float cofvarW, cofvarWW;
 
-  Fk=malloc(2*sizeof(float)); if(Fk == NULL){return 1;}
-  Jac=alloctabf(2,1); if(Jac == NULL){return 1;}
-  Wq=malloc(nQuad*sizeof(float)); if(Wq == NULL){return 1;} // points et poids de quadrature
-  Xq=alloctabf(nQuad,1);  if(Xq == NULL){return 1;} // sur les aretes les points de quadrature sont des reels
-  fctbase=malloc(nbneel*sizeof(float)); if(fctbase == NULL){return 1;}
-  Derfctbase=alloctabf(nbneel,1); if(Derfctbase == NULL){return 1;}
+  float Fk[2];
+  float **Jac=alloctabf(2,1); if(Jac==NULL){return 1;};
+  float Wq[nQuad]; // points et poids de quadrature
+  float **Xq=alloctabf(nQuad,1); if(Xq==NULL){return 1;}; // sur les aretes les points de quadrature sont des reels
+  float fctbase[nbneel];
+  float **Derfctbase=alloctabf(nbneel,1); if(Derfctbase==NULL){return 1;};
 
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
@@ -102,8 +97,7 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
     calFbase(nbneel, Xq[i], fctbase); 
     calDerFbase(nbneel, Xq[i], Derfctbase); 
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
-    Fk[0]=Xq[i][0]*(coorAr[0][0]-coorAr[1][0])+coorAr[1][0];   // coorAr[0][0]-coorAr[1][0]=Jac[0]
-    Fk[1]=Xq[i][0]*(coorAr[0][1]-coorAr[1][1])+coorAr[1][1];   // Jac[1]
+    transFk(nbneel, coorAr, Fk, fctbase); // Fk : valeur de Fk en xq[i]
     L=sqrt(Jac[0][0]*Jac[0][0] + Jac[1][0]*Jac[1][0]);	
     eltdif=L*Wq[i];
     cofvarW=FN(Fk);
@@ -112,9 +106,8 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
     W(nbneel, fctbase, eltdif, cofvarW, SMbrAret);
     WW(nbneel, fctbase, eltdif, cofvarWW, MatAret);
   }
-  free(Fk); free(Jac);
-  free(Wq); free(Xq);
-  free(fctbase); freetab(Derfctbase);
+  freetab(Jac); freetab(Xq);
+  freetab(Derfctbase);
   return 0;
 }
 
@@ -328,13 +321,13 @@ void ADWDW(int nbneel, float **Derfctbas, float **InvJac, float eltdif, float **
   float coeff0, coeff1, Derfct0, Derfct1;
   for(i=0; i<nbneel; i++){
     for(alpha=0;alpha<2;alpha++){
+		DWi=Derfctbas[i][0]*InvJac[0][alpha]+Derfctbas[i][1]*InvJac[1][alpha];
         for(beta=0;beta<2;beta++){
-          DWi=Derfctbas[i][0]*InvJac[0][alpha]+Derfctbas[i][1]*InvJac[1][alpha];
           coeff=DWi*eltdif*cofvar[alpha][beta];
           for(j=0;j<nbneel;j++){
-                DWj=Derfctbas[j][0]*InvJac[0][alpha]+Derfctbas[j][1]*InvJac[1][alpha];
-        matelm[i][j]=matelm[i][j] + DWj*coeff;
-      // on somme sur les != points de quad grâce aux appels de la fonction
+            DWj=Derfctbas[j][0]*InvJac[0][beta]+Derfctbas[j][1]*InvJac[1][beta];
+            matelm[i][j]=matelm[i][j] + DWj*coeff;
+            // on somme sur les != points de quad grâce aux appels de la fonction
           }
        }
     }

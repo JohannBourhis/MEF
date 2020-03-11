@@ -22,7 +22,6 @@ int main(){
   float **coorEl = alloctabf(nbneel,2);
 
 // Numero des ref des aretes
-  int *nRefArEl=malloc(nbneel*sizeof(int));
   int nRefDom=0;
   // Dirichlet
   int nbRefD0=1;
@@ -43,15 +42,14 @@ int main(){
   float *uDElem=malloc(nbneel*sizeof(float));
   
 // Boucle sur les elements
+  int num[nbneel];
   for(int i=0;i<ntel;i++){
     for(int j=0;j<nbneel;j++){
-      coorEl[j][0]=coord[ngnel[i][j]-1][0];
-      coorEl[j][1]=coord[ngnel[i][j]-1][1];
-      nRefArEl[j]=nRefAr[i][j];
+	  num[j]=ngnel[i][j];
     }
-  res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefArEl, nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
-  printf("res = %d \n",res);
-  
-  impCalEl(i+1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem);
+    selectPts(nbneel, num,coord,coorEl);
+    res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefAr[i], nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1, MatElem, SMbrElem, NuDElem, uDElem);
+    printf("res = %d \n",res);
+    impCalEl(i+1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem);
   }
 }
