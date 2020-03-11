@@ -16,7 +16,7 @@ Arguments de sortie :
 	float* SmbreElm : Les éléments du second membre, pour tout i
 ===============================================*/
 int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
-  int i, j, k, nQuad;
+  int i, nQuad;
   float detJac, eltdif;
   float cofvarW, cofvarWW;
   float eps=EPS;
@@ -137,7 +137,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   int nbRefD0, int *numRefD0, int nbRefD1, int *numRefD1, int nbRefF1, int *numRefF1, 
     float **MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
-  int i, j, k, l, nk, nl, R, numAr, condAr;
+  int i, j, k, l, nk, nl, R, condAr;
   int numNoeuds[2]; float *coorAr[2];
   
   // Mini-matrice pour les aretes
@@ -318,7 +318,6 @@ Arguments d'entrée :
 void ADWDW(int nbneel, float **Derfctbas, float **InvJac, float eltdif, float **cofvar, float **matelm){
   int i,j,alpha,beta;
   float DWi, DWj, coeff;
-  float coeff0, coeff1, Derfct0, Derfct1;
   for(i=0; i<nbneel; i++){
     for(alpha=0;alpha<2;alpha++){
 		DWi=Derfctbas[i][0]*InvJac[0][alpha]+Derfctbas[i][1]*InvJac[1][alpha];
