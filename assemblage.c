@@ -38,8 +38,8 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
   int *NbLign, int *NbCoef, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
     int res;
-	int dimDiag = ntel;
-	int dimLmat = dimDiag*(typel+1);
+	int dimDiag = *NbLign;
+	//int dimLmat = dimDiag*(typel+1);
 	float *DiagMat=&Matrice[0];
 	float *LowMat=&Matrice[dimDiag];
 	// Initialisation des vecteurs
@@ -91,16 +91,16 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  ----------------------------------------------*/
  void EcrSMD(int *NbCoef, int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
-          FILE* SMD;
+	  FILE* SMD;
       if((SMD = fopen("SMD.txt", "w")) != NULL){
-                fwrite(NbLign, sizeof(int), 1, SMD);
-                fwrite(SecMembre, sizeof(float), *NbLign, SMD);
-                fwrite(NumDLDir, sizeof(int), *NbLign, SMD);
-                fwrite(ValDLDir, sizeof(float), *NbLign, SMD);
-                fwrite(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-                fwrite(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
-                fwrite(NumCol, sizeof(float), *NbCoef, SMD);
-                fwrite(AdSuccLi, sizeof(int), *NbCoef, SMD);
+		fwrite(NbLign, sizeof(int), 1, SMD);
+		fwrite(SecMembre, sizeof(float), *NbLign, SMD);
+		fwrite(NumDLDir, sizeof(int), *NbLign, SMD);
+		fwrite(ValDLDir, sizeof(float), *NbLign, SMD);
+		fwrite(AdPrCoefLi, sizeof(int), *NbLign, SMD);
+		fwrite(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
+		fwrite(NumCol, sizeof(float), *NbCoef, SMD);
+		fwrite(AdSuccLi, sizeof(int), *NbCoef, SMD);
       }
       fclose(SMD);
  } 
@@ -109,17 +109,16 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
     FILE* SMD;
     if((SMD = fopen("SMD.txt", "r")) != NULL){
-                fread(NbLign, sizeof(int), 1, SMD);
-                fread(SecMembre, sizeof(float), *NbLign, SMD);
-                fread(NumDLDir, sizeof(int), *NbLign, SMD);
-                fread(ValDLDir, sizeof(float), *NbLign, SMD);
-                fread(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-                *NbCoef=AdPrCoefLi[*NbLign-1]-1;
-                fread(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
-                fread(NumCol, sizeof(float), *NbCoef, SMD);
-                fread(AdSuccLi, sizeof(int), *NbCoef, SMD);
+		fread(NbLign, sizeof(int), 1, SMD);
+		fread(SecMembre, sizeof(float), *NbLign, SMD);
+		fread(NumDLDir, sizeof(int), *NbLign, SMD);
+		fread(ValDLDir, sizeof(float), *NbLign, SMD);
+		fread(AdPrCoefLi, sizeof(int), *NbLign, SMD);
+		*NbCoef=AdPrCoefLi[*NbLign-1]-1;
+		fread(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
+		fread(NumCol, sizeof(float), *NbCoef, SMD);
+		fread(AdSuccLi, sizeof(int), *NbCoef, SMD);
     } 
     affsmd_(NbLign,AdPrCoefLi,NumCol,AdSuccLi,Matrice,SecMembre,NumDLDir,ValDLDir);
     fclose(SMD);
 }
-
