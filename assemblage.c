@@ -40,13 +40,6 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     int res;
 	int dimDiag = ntel;
 	int dimLmat = dimDiag*(typel+1);
-	Matrice = malloc((dimLmat+dimDiag)*sizeof(float));
-	NumCol=malloc(dimLmat*sizeof(float));
-	AdSuccLi=malloc(dimLmat*sizeof(float));
-	AdPrCoefLi=malloc((dimDiag-1)*sizeof(float));
-	SecMembre=malloc(dimDiag*sizeof(float));
-	NumDLDir=malloc(dimDiag*sizeof(int));
-	ValDLDir=malloc(dimDiag*sizeof(float));
 	float *DiagMat=&Matrice[0];
 	float *LowMat=&Matrice[dimDiag];
 	// Initialisation des vecteurs
