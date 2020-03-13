@@ -1,0 +1,57 @@
+Cas ou :
+A_ij = DELTA_ij, FOMEGA = 1, UD = 100*x + y
+A_00 = 1, BN = 1, FN = 1
+avec car1x1t_1 et numeros de reference comme dans Tests.1x1
+
+
+me041001(64) a.out 
+Lecture du fichier ../../maillage/NUMREF
+Donner le nom du fichier de maillage : ../../triangu/car1x1t_1
+* Module lecfima *
+
+Sauvegarde de la S.M.D. dans le fichier SMD
+ ****** Affichage de la S.M.D. ******
+ Donner, dans l'intervalle [1,           4 ], les indices min et max des lignes a afficher. Taper q pour arreter.
+1 4
+
+ Ligne     SecMbr    Nuddir     Valdir
+     1   0.1667E+00       0   0.0000E+00
+     2   0.8333E+00       0   0.0000E+00
+     3   0.8333E+00      -3   0.1000E+01
+     4   0.1167E+01       4   0.0000E+00
+ === MATRICE ===========================
+ --- Ligne 1 ---
+Col   1 :    1.08333    
+ --- Ligne            2  ---
+Col   1 :  -0.458333    
+Col   2 :    1.50000    
+ --- Ligne            3  ---
+Col   2 :   0.833333E-01
+Col   1 :  -0.458333    
+Col   3 :    1.50000    
+ --- Ligne            4  ---
+Col   3 :  -0.291667    
+Col   2 :  -0.291667    
+Col   4 :    1.75000    
+ Donner, dans l'intervalle [1,           4 ], les indices min et max des lignes a afficher. Taper q pour arreter.
+q
+Sauvegarde de la S.M.O. dans le fichier SMO
+  NOMBRE DE LIGNES :           4
+  NUMEROS DE LA PREMIERE ET DE LA DERNIERE LIGNE ?
+  TAPER Q POUR TERMINER.
+1 4
+ LIGNE     SECMB0      MATRI0(coefficients
+                              + colonnes)
+     1   0.0000E+00  0.1083E+01
+                              1
+     2   0.0000E+00  0.1500E+01
+                              2
+     3   0.1500E+01  0.1500E+01
+                              3
+     4   0.1458E+01  0.1750E+01
+                              4
+  NUMEROS DE LA PREMIERE ET DE LA DERNIERE LIGNE ?
+  TAPER Q POUR TERMINER.
+q
+me041001(65) 
+
