@@ -46,10 +46,11 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
 	for(int i=0;i<dimDiag;i++){
 	  DiagMat[i]=0;
 	  SecMembre[i]=0;
+	  NumDLDir[i]=i+1;
 	}
 	// Variables nécessaires aux calculs élémentaires
 	int nextad=1;
-	int I,J,L;
+	int I,Il,J;
     int num[nbneel];
     float **coorEl = alloctabf(nbneel,2);
     float **MatElem=alloctabf(nbneel,nbneel);
@@ -69,14 +70,20 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
 	//impCalEl(i+1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem); // Affichage pour vérification
 	for(int i=0;i<nbneel;i++){
 	  I=ngnel[k][i];
-	  DiagMat[I-1]+=MatElem[i][i];
-	  SecMembre[I-1]+=SMbrElem[i];
-	  NumDLDir[I-1]=NuDElem[i]*I;
-      ValDLDir[I-1]=uDElem[i];
+	  Il=I-1;
+	  DiagMat[Il]+=MatElem[i][i];
+	  SecMembre[Il]+=SMbrElem[i];
+	  if(NumDLDir[Il]>0){
+	    NumDLDir[Il]*=NuDElem[i];
+        ValDLDir[Il]=uDElem[i];
+	  }
 	  for(int j=0;j<i;j++){
 		J=ngnel[k][j];
-		if(I<J){ L=I; I=J; J=L;}  //symétrie : I=max(I,J), J=min(I,J)
-		assmat_(&I, &J, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
+		if(I<J){  //symétrie : I=max(I,J), J=min(I,J)
+		  assmat_(&J, &I, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
+	    }else{
+		  assmat_(&I, &J, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
+		}
 	  }
     }
   }
