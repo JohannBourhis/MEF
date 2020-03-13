@@ -38,53 +38,53 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
   int *NbLign, int *NbCoef, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
     int res;
-	int dimDiag = *NbLign;
-	//int dimLmat = dimDiag*(typel+1);
-	float *DiagMat=&Matrice[0];
-	float *LowMat=&Matrice[dimDiag];
-	// Initialisation des vecteurs
-	for(int i=0;i<dimDiag;i++){
-	  DiagMat[i]=0;
-	  SecMembre[i]=0;
-	  NumDLDir[i]=i+1;
-	}
-	// Variables nécessaires aux calculs élémentaires
-	int nextad=1;
-	int I,Il,J;
+    int dimDiag = *NbLign;
+    //int dimLmat = dimDiag*(typel+1);
+    float *DiagMat = &Matrice[0];
+    float *LowMat = &Matrice[dimDiag];
+    // Initialisation des vecteurs
+    for(int i=0 ; i<dimDiag ; i++){
+      DiagMat[i] = 0;
+      SecMembre[i] = 0;
+      NumDLDir[i] = i+1;
+    }
+    // Variables nécessaires aux calculs élémentaires
+    int nextad = 1;
+    int I, Il, J;
     int num[nbneel];
-    float **coorEl = alloctabf(nbneel,2);
-    float **MatElem=alloctabf(nbneel,nbneel);
+    float **coorEl = alloctabf(nbneel, 2);
+    float **MatElem = alloctabf(nbneel, nbneel);
     float SMbrElem[nbneel];
     int NuDElem[nbneel];
     float uDElem[nbneel]; 
     // Boucle sur les elements
-    for(int k=0;k<ntel;k++){
-	  for(int j=0;j<nbneel;j++){
-		num[j]=ngnel[k][j];
-	  }
-	selectPts(nbneel,num,coord,coorEl);
-	res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefAr[k], nbRefD0,
-	  numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
-	  MatElem, SMbrElem, NuDElem, uDElem);
-	if(res){return res;}
-	//impCalEl(i+1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem); // Affichage pour vérification
-	for(int i=0;i<nbneel;i++){
-	  I=ngnel[k][i];
-	  Il=I-1;
-	  DiagMat[Il]+=MatElem[i][i];
-	  SecMembre[Il]+=SMbrElem[i];
-	  if(NumDLDir[Il]>0){
-	    NumDLDir[Il]*=NuDElem[i];
-        ValDLDir[Il]=uDElem[i];
-	  }
-	  for(int j=0;j<i;j++){
-		J=ngnel[k][j];
-		if(I<J){  //symétrie : I=max(I,J), J=min(I,J)
-		  assmat_(&J, &I, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
-	    }else{
-		  assmat_(&I, &J, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
-		}
-	  }
+    for(int k=0 ; k<ntel ; k++){
+      for(int j=0 ; j<nbneel ; j++){
+	num[j] = ngnel[k][j];
+      }
+      selectPts(nbneel,num,coord,coorEl);
+      res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefAr[k], nbRefD0,
+      numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
+      MatElem, SMbrElem, NuDElem, uDElem);
+      if(res){return res;}
+      //impCalEl(i+1, typel, nbneel, MatElem, SMbrElem, NuDElem, uDElem); // Affichage pour vérification
+      for(int i=0 ; i<nbneel ; i++){
+        I = ngnel[k][i];
+        Il = I-1;
+        DiagMat[Il] += MatElem[i][i];
+        SecMembre[Il] += SMbrElem[i];
+        if(NumDLDir[Il]>0){
+	  NumDLDir[Il] *= NuDElem[i];
+          ValDLDir[Il] = uDElem[i];
+	}
+	for(int j=0;j<i;j++){
+          J = ngnel[k][j];
+	  if(I<J){  //symétrie : I=max(I,J), J=min(I,J)
+	    assmat_(&J, &I, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
+	  }else{
+	    assmat_(&I, &J, &MatElem[i][j], AdPrCoefLi, NumCol, AdSuccLi, LowMat, &nextad);
+	}
+      }
     }
   }
   return 0;
@@ -98,34 +98,34 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  ----------------------------------------------*/
  void EcrSMD(int *NbCoef, int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
-	  FILE* SMD;
-      if((SMD = fopen("SMD.txt", "w")) != NULL){
-		fwrite(NbLign, sizeof(int), 1, SMD);
-		fwrite(SecMembre, sizeof(float), *NbLign, SMD);
-		fwrite(NumDLDir, sizeof(int), *NbLign, SMD);
-		fwrite(ValDLDir, sizeof(float), *NbLign, SMD);
-		fwrite(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-		fwrite(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
-		fwrite(NumCol, sizeof(float), *NbCoef, SMD);
-		fwrite(AdSuccLi, sizeof(int), *NbCoef, SMD);
-      }
-      fclose(SMD);
- } 
+    FILE* SMD;
+    if((SMD = fopen("SMD.txt", "w")) != NULL){
+      fwrite(NbLign, sizeof(int), 1, SMD);
+      fwrite(SecMembre, sizeof(float), *NbLign, SMD);
+      fwrite(NumDLDir, sizeof(int), *NbLign, SMD);
+      fwrite(ValDLDir, sizeof(float), *NbLign, SMD);
+      fwrite(AdPrCoefLi, sizeof(int), *NbLign, SMD);
+      fwrite(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
+      fwrite(NumCol, sizeof(float), *NbCoef, SMD);
+      fwrite(AdSuccLi, sizeof(int), *NbCoef, SMD);
+    }
+    fclose(SMD);
+} 
 
  void LecSMD(int *NbCoef, int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
     FILE* SMD;
     if((SMD = fopen("SMD.txt", "r")) != NULL){
-		fread(NbLign, sizeof(int), 1, SMD);
-		fread(SecMembre, sizeof(float), *NbLign, SMD);
-		fread(NumDLDir, sizeof(int), *NbLign, SMD);
-		fread(ValDLDir, sizeof(float), *NbLign, SMD);
-		fread(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-		*NbCoef=AdPrCoefLi[*NbLign-1]-1;
-		fread(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
-		fread(NumCol, sizeof(float), *NbCoef, SMD);
-		fread(AdSuccLi, sizeof(int), *NbCoef, SMD);
-    } 
-    affsmd_(NbLign,AdPrCoefLi,NumCol,AdSuccLi,Matrice,SecMembre,NumDLDir,ValDLDir);
-    fclose(SMD);
+      fread(NbLign, sizeof(int), 1, SMD);
+      fread(SecMembre, sizeof(float), *NbLign, SMD);
+      fread(NumDLDir, sizeof(int), *NbLign, SMD);
+      fread(ValDLDir, sizeof(float), *NbLign, SMD);
+      fread(AdPrCoefLi, sizeof(int), *NbLign, SMD);
+      *NbCoef=AdPrCoefLi[*NbLign-1]-1;
+      fread(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
+      fread(NumCol, sizeof(float), *NbCoef, SMD);
+      fread(AdSuccLi, sizeof(int), *NbCoef, SMD);
+   } 
+   affsmd_(NbLign,AdPrCoefLi,NumCol,AdSuccLi,Matrice,SecMembre,NumDLDir,ValDLDir);
+   fclose(SMD);
 }
