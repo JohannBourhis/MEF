@@ -64,7 +64,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     for(j=0 ; j<nbneel ; j++){
       noeuds[j] = ngnel[k][j];
     }
-    selectPts(nbneel,noeuds,coord,coorEl);
+    selectPts(nbneel, noeuds, coord, coorEl);
     // calculs élémentaires
     res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefAr[k], nbRefD0,
           numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
