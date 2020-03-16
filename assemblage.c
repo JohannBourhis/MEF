@@ -46,8 +46,8 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
   int nextad = 1;
   int I, Il, J;
   int noeuds[nbneel];
-  float **coorEl = alloctabf(nbneel, 2);
-  float **MatElem = alloctabf(nbneel, nbneel);
+  float **coorEl = alloctabf(nbneel, 2); if(coorEl==NULL){return 1;}
+  float **MatElem = alloctabf(nbneel, nbneel); if(MatElem==NULL){return 1;}
   float SMbrElem[nbneel];
   int NuDElem[nbneel];
   float uDElem[nbneel];
@@ -60,14 +60,17 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
   AdPrCoefLi[0]=0; AdPrCoefLi[1]=0;
   // Boucle sur les elements
   for(k=0 ; k<ntel ; k++){
+    // sélections des noeuds de l'éléments
     for(j=0 ; j<nbneel ; j++){
       noeuds[j] = ngnel[k][j];
     }
     selectPts(nbneel,noeuds,coord,coorEl);
+    // calculs élémentaires
     res = cal1Elem(nbneel, nbaret, nRefDom, coorEl, nRefAr[k], nbRefD0,
           numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
           MatElem, SMbrElem, NuDElem, uDElem);
     if(res){return res;}
+    // assemblage de la matrice
     for(i=0 ; i<nbneel ; i++){
       I = ngnel[k][i];
       Il = I-1;
@@ -127,11 +130,11 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     fread(NumDLDir, sizeof(int), *NbLign, SMD);
     fread(ValDLDir, sizeof(float), *NbLign, SMD);
     fread(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-    *NbCoef=AdPrCoefLi[*NbLign-1]-1;
+    *NbCoef = AdPrCoefLi[*NbLign-1]-1;
     fread(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
     fread(NumCol, sizeof(float), *NbCoef, SMD);
     fread(AdSuccLi, sizeof(int), *NbCoef, SMD);
   }
-  affsmd_(NbLign,AdPrCoefLi,NumCol,AdSuccLi,Matrice,SecMembre,NumDLDir,ValDLDir);
+  affsmd_(NbLign, AdPrCoefLi, NumCol, AdSuccLi, Matrice, SecMembre, NumDLDir, ValDLDir);
   fclose(SMD);
 }
