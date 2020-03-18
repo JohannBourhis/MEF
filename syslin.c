@@ -1,8 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "calElmt.h"
-#include "int.h"
-#include "maille.h"
 #include "forfun.h"
 
 
@@ -28,13 +25,13 @@ void LecSMD_TP4(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int
 		fread(ValDLDir_temp, sizeof(float), *NbLign, SMD);
 		fread(AdPrCoefLi_temp, sizeof(int), *NbLign, SMD);
 		
-		(*NbCoef)=AdPrCoefLi_temp[NbL-1]-1;
+		(*NbCoef)=AdPrCoefLi_temp[*NbLign-1]-1;
 		float *Matrice_temp;  Matrice_temp=malloc((*NbCoef)*sizeof(float));
-		float *NumCol_temp;  NumCol_temp=malloc((*NbCoef)*sizeof(float));
+		int *NumCol_temp;  NumCol_temp=malloc((*NbCoef)*sizeof(int));
 		int *AdSuccLi_temp;  AdSuccLi_temp=malloc((*NbCoef)*sizeof(int));
 		
 		fread(Matrice_temp, sizeof(float), (*NbLign)+(*NbCoef), SMD);
-		fread(NumCol_temp, sizeof(float), *NbCoef, SMD);
+		fread(NumCol_temp, sizeof(int), *NbCoef, SMD);
 		fread(AdSuccLi_temp, sizeof(int), *NbCoef, SMD);
 	    
 	    //transmission des tableaux en dehors de la fonction
@@ -97,7 +94,7 @@ void dSMDaSMO(/*char *fic_SMD*/){
   int *NumDLDir;
   float *ValDLDir;
   // remplissage des tableaux
-  LecSMD(&NbCoef, &NbLign, &Matrice, &AdPrCoefLi, &AdSuccLi, 
+  LecSMD_TP4(&NbCoef, &NbLign, &Matrice, &AdPrCoefLi, &AdSuccLi, 
     &NumCol, &SecMembre, &NumDLDir, &ValDLDir);
 
   // SMO
@@ -111,15 +108,15 @@ void dSMDaSMO(/*char *fic_SMD*/){
   NumColO=malloc(NbCoef*sizeof(float));
 
   //Appel à la procèdure fortran pour creer le SMO
-  cdesse_(NbLign, AdSuccLi, NumCol, AdSuccLi, Matrice, SecMembre, NumDLDir, ValDLDir,
-   AdSuccLiO, NumColO, MatriceO, SecMembreO);
+  cdesse_(&NbLign, AdSuccLi, NumCol, AdSuccLi, Matrice, SecMembre, NumDLDir, ValDLDir,
+   AdPrCoefLiO, NumColO, MatriceO, SecMembreO);
 
   // Création du système linéaire ???
 
   // écriture de la SMO
   FILE* SMO;
   if((SMO = fopen("SMD.txt", "w")) != NULL){
-	fwrite(NbLign, sizeof(int), 1, SMO);
+	fwrite(&NbLign, sizeof(int), 1, SMO);
     fwrite(SecMembreO, sizeof(float), NbLign, SMO);
 	fwrite(AdPrCoefLiO, sizeof(int), NbLign, SMO);
 	fwrite(MatriceO, sizeof(float), NbLign+NbCoef, SMO);
@@ -137,12 +134,12 @@ void dSMDaSMO(/*char *fic_SMD*/){
  Procédure qui lit la SMO de A
  Tous les arguments sont des arguments de sorties, toutes les informations sont écrites sur le fichier
  ----------------------------------------------*/
-void LecSMO(int *NbCoef, int *NbLign, float **Matrice0, int **AdPrCoefLi0,
+void LecSMO(int *NbCoef, int *NbLign, float **MatriceO, int **AdPrCoefLiO,
   int **NumColO, float **SecMembreO){
 	FILE* SMO;
     // on peut utiliser une chaine de caractère pour transmettre le nom du fichier texte
     if((SMO = fopen("SMO.txt", "r")) != NULL){
-		fread(NbLign, sizeof(int), 1, SMD);
+		fread(NbLign, sizeof(int), 1, SMO);
 		int NbL = (*NbLign);
 		// allocation des tableaux temporaires
 		float *SecMembre_temp;   SecMembre_temp=malloc((*NbLign)*sizeof(float));
@@ -153,10 +150,10 @@ void LecSMO(int *NbCoef, int *NbLign, float **Matrice0, int **AdPrCoefLi0,
 		
 		(*NbCoef)=AdPrCoefLi_temp[NbL-1]-1;
 		float *Matrice_temp;  Matrice_temp=malloc((*NbCoef)*sizeof(float));
-		float *NumCol_temp;  NumCol_temp=malloc((*NbCoef)*sizeof(float));
+		int *NumCol_temp;  NumCol_temp=malloc((*NbCoef)*sizeof(float));
 		
-		fread(Matrice_temp, sizeof(float), (*NbLign)+(*NbCoef), SMD);
-		fread(NumCol_temp, sizeof(float), *NbCoef, SMD);
+		fread(Matrice_temp, sizeof(float), (*NbLign)+(*NbCoef), SMO);
+		fread(NumCol_temp, sizeof(float), *NbCoef, SMO);
 	    
 	    //transmission des tableaux en dehors de la fonction
 	    *SecMembreO= SecMembre_temp;
@@ -171,7 +168,7 @@ void LecSMO(int *NbCoef, int *NbLign, float **Matrice0, int **AdPrCoefLi0,
 	    free(NumCol_temp);
 
 	    //affsmd_(NbLign,AdPrCoefLi,NumCol,AdSuccLi,Matrice,SecMembre,NumDLDir,ValDLDir);
-	    fclose(SMD);
+	    fclose(SMO);
     }
     else {printf("Erreur ouverture du fichier SMD\n"); }
 }
