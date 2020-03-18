@@ -56,7 +56,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     DiagMat[i] = 0;
     SecMembre[i] = 0;
     NumDLDir[i] = i+1;
-    AdPrCoefLi[i]=0;
+    AdPrCoefLi[i] = 0;
   }
   // Boucle sur les elements
   for(k=0 ; k<ntel ; k++){
@@ -90,8 +90,8 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
       }
     }
   }
-  AdPrCoefLi[*NbLign-1]=nextad;
-  (*NbCoef)=AdPrCoefLi[*NbLign-1]-1;
+  AdPrCoefLi[*NbLign-1] = nextad;
+  (*NbCoef) = AdPrCoefLi[*NbLign-1]-1;
   return 0;
 }
 
