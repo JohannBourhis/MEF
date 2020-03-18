@@ -56,6 +56,8 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     DiagMat[i] = 0;
     SecMembre[i] = 0;
     NumDLDir[i] = i+1;
+  }
+  for(i=0 ; i<ntel ; i++){
     AdPrCoefLi[i]=0;
   }
   // Boucle sur les elements
@@ -90,8 +92,6 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
       }
     }
   }
-  AdPrCoefLi[*NbLign-1]=nextad;
-  (*NbCoef)=AdPrCoefLi[*NbLign-1]-1;
   return 0;
 }
 
@@ -140,15 +140,13 @@ void LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **A
 	fread(ValDLDir_temp, sizeof(float), *NbLign, SMD);
 	fread(AdPrCoefLi_temp, sizeof(int), *NbLign, SMD);
 	(*NbCoef)=AdPrCoefLi_temp[*NbLign-1]-1;
-	float *Matrice_temp=malloc(((*NbLign)+(*NbCoef))*sizeof(float));
+	float *Matrice_temp=malloc((*NbCoef)*sizeof(float));
 	int *NumCol_temp=malloc((*NbCoef)*sizeof(int));
 	int *AdSuccLi_temp=malloc((*NbCoef)*sizeof(int));
 	fread(Matrice_temp, sizeof(float), (*NbLign)+(*NbCoef), SMD);
 	fread(NumCol_temp, sizeof(int), *NbCoef, SMD);
 	fread(AdSuccLi_temp, sizeof(int), *NbCoef, SMD);
 	//transmission des tableaux en dehors de la fonction
-    affsmd_(NbLign, AdPrCoefLi_temp, NumCol_temp, AdSuccLi_temp, Matrice_temp,
-            SecMembre_temp, NumDLDir_temp, ValDLDir_temp);
 	*SecMembre = SecMembre_temp;
     *NumDLDir = NumDLDir_temp;
     *ValDLDir = ValDLDir_temp;
@@ -156,6 +154,15 @@ void LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **A
     *Matrice = Matrice_temp;
     *NumCol = NumCol_temp;
     *AdSuccLi = AdSuccLi_temp;
+    //Liberation de la mémoire
+    free(SecMembre_temp);
+    free(NumDLDir_temp);
+    free(ValDLDir_temp);
+    free(AdPrCoefLi_temp);
+    free(Matrice_temp);
+    free(NumCol_temp);
+    free(AdSuccLi_temp);
+    //affsmd_(NbLign,AdPrCoefLi,NumCol,AdSuccLi,Matrice,SecMembre,NumDLDir,ValDLDir);
     fclose(SMD);
   }
   else {printf("Erreur ouverture du fichier SMD\n"); }
