@@ -102,7 +102,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  *
  ---------------------------------------------------*/
  void EcrSMD(int *NbCoef, int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
-             int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
+            int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
   FILE* SMD;
   if((SMD = fopen("SMD.txt", "w")) != NULL){
     fwrite(NbLign, sizeof(int), 1, SMD);
@@ -123,26 +123,26 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  *
  *
  --------------------------------------------------*/
-void LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **AdSuccLi,
+int LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **AdSuccLi,
             int **NumCol, float **SecMembre, int **NumDLDir, float **ValDLDir){
   FILE* SMD;
   // on peut utiliser une chaine de caractère pour transmettre le nom du fichier texte
   if((SMD = fopen("SMD.txt", "r")) != NULL){
     fread(NbLign, sizeof(int), 1, SMD);
     // allocation des tableaux temporaires
-	float *SecMembre_temp = malloc((*NbLign)*sizeof(float));
-	int *NumDLDir_temp = malloc((*NbLign)*sizeof(int));
-	float *ValDLDir_temp = malloc((*NbLign)*sizeof(float));
-	int *AdPrCoefLi_temp = malloc((*NbLign)*sizeof(int));
+	float *SecMembre_temp = malloc((*NbLign)*sizeof(float)); if(SecMembre_temp==NULL){return 1;}
+	int *NumDLDir_temp = malloc((*NbLign)*sizeof(int)); if(NumDLDir_temp==NULL){return 1;}
+	float *ValDLDir_temp = malloc((*NbLign)*sizeof(float)); if(ValDLDir_temp==NULL){return 1;}
+	int *AdPrCoefLi_temp = malloc((*NbLign)*sizeof(int)); if(AdPrCoefLi_temp==NULL){return 1;}
 	// lecture
 	fread(SecMembre_temp, sizeof(float), *NbLign, SMD);
 	fread(NumDLDir_temp, sizeof(int), *NbLign, SMD);
 	fread(ValDLDir_temp, sizeof(float), *NbLign, SMD);
 	fread(AdPrCoefLi_temp, sizeof(int), *NbLign, SMD);
 	(*NbCoef)=AdPrCoefLi_temp[*NbLign-1]-1;
-	float *Matrice_temp=malloc(((*NbLign)+(*NbCoef))*sizeof(float));
-	int *NumCol_temp=malloc((*NbCoef)*sizeof(int));
-	int *AdSuccLi_temp=malloc((*NbCoef)*sizeof(int));
+	float *Matrice_temp = malloc(((*NbLign)+(*NbCoef))*sizeof(float)); if(Matrice_temp==NULL){return 1;}
+	int *NumCol_temp = malloc((*NbCoef)*sizeof(int)); if(NumCol_temp==NULL){return 1;}
+	int *AdSuccLi_temp = malloc((*NbCoef)*sizeof(int)); if(AdSuccLi_temp==NULL){return 1;}
 	fread(Matrice_temp, sizeof(float), (*NbLign)+(*NbCoef), SMD);
 	fread(NumCol_temp, sizeof(int), *NbCoef, SMD);
 	fread(AdSuccLi_temp, sizeof(int), *NbCoef, SMD);
@@ -158,5 +158,9 @@ void LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **A
     *AdSuccLi = AdSuccLi_temp;
     fclose(SMD);
   }
-  else {printf("Erreur ouverture du fichier SMD\n"); }
+  else {
+    printf("Erreur ouverture du fichier SMD\n");
+    return 2;
+  }
+  return 0;
 }

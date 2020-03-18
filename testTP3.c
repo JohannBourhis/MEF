@@ -4,6 +4,7 @@
 #include "calElmt.h"
 #include "int.h"
 #include "assemblage.h"
+#include "syslin.h"
 #include "forfun.h"
 
  // gcc * -lm   pour utiliser math.h
@@ -58,23 +59,19 @@ int main(){
              nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
              NbLign, NbCoef, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
              NumDLDir, ValDLDir);
-  for(int i=0;i<dimDiag;i++){
-    printf("AdPrCoefLi(%d) %d\n",i,AdPrCoefLi[i]);
-  }
-  for(int i=0;i<dimLmat;i++){
-    printf("M(%d) %f\n",i,Matrice[dimDiag+i-1]);
-  }
-  printf("NbCoef %d\n", NbCoef[0]);
-  printf("NbLign %d\n", NbLign[0]);
+
   printf("EcrSMD\n");
   EcrSMD(NbCoef, NbLign, Matrice, AdPrCoefLi, AdSuccLi,
-  NumCol, SecMembre, NumDLDir, ValDLDir);
-  printf("LecSMD\n");
-  int LNbCoef, LNbLign, *LAdPrCoefLi, *LAdSuccLi, *LNumCol, *LNumDLDir;
-  float *LMatrice, *LSecMembre, *LValDLDir;
-  LecSMD(&LNbCoef, &LNbLign, &LMatrice, &LAdPrCoefLi, &LAdSuccLi,
-         &LNumCol, &LSecMembre, &LNumDLDir, &LValDLDir);
-  printf("End\n");
-  printf("NbCoef %d\n", LNbCoef);
-  printf("NbLign %d\n", LNbLign);
+         NumCol, SecMembre, NumDLDir, ValDLDir);
+
+  float *MatriceO = malloc(*NbCoef*sizeof(float));
+  int *NumColO = malloc(*NbCoef*sizeof(int));
+
+  printf("Assemblage de SMO");
+  dSMDaSMO(NbLign, SecMembre, AdPrCoefLi, MatriceO, NumColO);
+  printf("LecSMO\n");
+  int LNbCoef, LNbLign, *LAdPrCoefLiO, *LNumColO;
+  float *LMatriceO, *LSecMembreO;
+  LecSMO(&LNbCoef, &LNbLign, &LMatriceO, &LAdPrCoefLiO,
+         &LNumColO, &LSecMembreO);
 }

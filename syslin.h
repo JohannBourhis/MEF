@@ -1,8 +1,6 @@
-void LecSMD_TP4(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **AdSuccLi,
-  int **NumCol, float **SecMembre, int **NumDLDir, float **ValDLDir);
+int LecSMO(int *NbCoef, int *NbLign, float **MatriceO, int **AdPrCoefLiO,
+            int **NumColO, float **SecMembreO);
 
-void dSMDaSMO(/*char *fic_SMD*/);
-
-void LecSMO(int *NbCoef, int *NbLign, float **MatriceO, int **AdPrCoefLiO,
-  int **NumColO, float **SecMembreO);
+void dSMDaSMO(int *NbLign, float *SecMembreO, int *AdPrCoefLiO,
+              float *MatriceO, int *NumColO);
 
