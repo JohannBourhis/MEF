@@ -1,8 +1,9 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h>
+#include "maille.h"
 #include "calElmt.h"
 #include "int.h"
-#include "maille.h"
+#include "syslin.h"
 #include "forfun.h"
 /* --------------------------------------
  * assemblage de la matrice
@@ -35,7 +36,7 @@ Arguments de sortie :
 int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
                float **coord, int **nRefAr, int **ngnel, int nbRefD0,
                int *numRefD0, int nbRefD1, int *numRefD1, int nbRefF1,
-               int *numRefF1, int *NbLign, int *NbCoef, float *Matrice,
+               int *numRefF1, int *NbLign, float *Matrice,
                int *AdPrCoefLi, int *AdSuccLi, int *NumCol, float *SecMembre,
                int *NumDLDir, float *ValDLDir){
   int i, j, k, res;
@@ -91,7 +92,6 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     }
   }
   AdPrCoefLi[*NbLign-1] = nextad;
-  (*NbCoef) = AdPrCoefLi[*NbLign-1]-1;
   return 0;
 }
 
@@ -101,7 +101,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  *
  *
  ---------------------------------------------------*/
- void EcrSMD(int *NbCoef, int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
+ void EcrSMD(int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
             int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
   FILE* SMD;
   if((SMD = fopen("SMD.txt", "w")) != NULL){
@@ -109,10 +109,19 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     fwrite(SecMembre, sizeof(float), *NbLign, SMD);
     fwrite(NumDLDir, sizeof(int), *NbLign, SMD);
     fwrite(ValDLDir, sizeof(float), *NbLign, SMD);
-    fwrite(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-    fwrite(Matrice, sizeof(float), *NbLign+*NbCoef, SMD);
-    fwrite(NumCol, sizeof(float), *NbCoef, SMD);
-    fwrite(AdSuccLi, sizeof(int), *NbCoef, SMD);
+    for(int i=0;i<*NbLign;i++){
+        fwrite(&AdPrCoefLi[i], sizeof(int), 1, SMD);
+    }
+
+    //for(int i=0; i<*NbLign; i++){
+    //  printf("AdPrCoefLi\n");
+    //  printf("%d\n", AdPrCoefLi[i]);
+    //}
+    int NbCoef = AdPrCoefLi[*NbLign-1]-1;
+    //printf("NBCOEF %d\n", NbCoef);
+    fwrite(Matrice, sizeof(float), *NbLign+NbCoef, SMD);
+    fwrite(NumCol, sizeof(int), NbCoef, SMD);
+    fwrite(AdSuccLi, sizeof(int), NbCoef, SMD);
   }
   fclose(SMD);
 }
@@ -123,7 +132,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  *
  *
  --------------------------------------------------*/
-int LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **AdSuccLi,
+int LecSMD(int *NbLign, float **Matrice, int **AdPrCoefLi, int **AdSuccLi,
             int **NumCol, float **SecMembre, int **NumDLDir, float **ValDLDir){
   FILE* SMD;
   // on peut utiliser une chaine de caractère pour transmettre le nom du fichier texte
@@ -138,14 +147,22 @@ int LecSMD(int *NbCoef, int *NbLign, float **Matrice, int **AdPrCoefLi, int **Ad
 	fread(SecMembre_temp, sizeof(float), *NbLign, SMD);
 	fread(NumDLDir_temp, sizeof(int), *NbLign, SMD);
 	fread(ValDLDir_temp, sizeof(float), *NbLign, SMD);
-	fread(AdPrCoefLi_temp, sizeof(int), *NbLign, SMD);
-	(*NbCoef)=AdPrCoefLi_temp[*NbLign-1]-1;
-	float *Matrice_temp = malloc(((*NbLign)+(*NbCoef))*sizeof(float)); if(Matrice_temp==NULL){return 1;}
-	int *NumCol_temp = malloc((*NbCoef)*sizeof(int)); if(NumCol_temp==NULL){return 1;}
-	int *AdSuccLi_temp = malloc((*NbCoef)*sizeof(int)); if(AdSuccLi_temp==NULL){return 1;}
-	fread(Matrice_temp, sizeof(float), (*NbLign)+(*NbCoef), SMD);
-	fread(NumCol_temp, sizeof(int), *NbCoef, SMD);
-	fread(AdSuccLi_temp, sizeof(int), *NbCoef, SMD);
+    for(int i=0;i<*NbLign;i++){
+        fread(&AdPrCoefLi_temp[i], sizeof(int), 1, SMD);
+        printf("%d \n",AdPrCoefLi_temp[i]);
+    }
+    //for(int i=0; i<*NbLign; i++){
+    //  printf("AdPrCoefLi\n");
+    //  printf("%d\n", AdPrCoefLi_temp[i]);
+    //}
+	int NbCoef=AdPrCoefLi_temp[*NbLign-1]-1;
+	//printf("nbcoef %d\n", NbCoef);
+	float *Matrice_temp = malloc((*NbLign+NbCoef)*sizeof(float)); if(Matrice_temp==NULL){return 1;}
+	int *NumCol_temp = malloc(NbCoef*sizeof(int)); if(NumCol_temp==NULL){return 1;}
+	int *AdSuccLi_temp = malloc(NbCoef*sizeof(int)); if(AdSuccLi_temp==NULL){return 1;}
+	fread(Matrice_temp, sizeof(float), *NbLign+NbCoef, SMD);
+	fread(NumCol_temp, sizeof(int), NbCoef, SMD);
+	fread(AdSuccLi_temp, sizeof(int), NbCoef, SMD);
 	//transmission des tableaux en dehors de la fonction
     affsmd_(NbLign, AdPrCoefLi_temp, NumCol_temp, AdSuccLi_temp, Matrice_temp,
             SecMembre_temp, NumDLDir_temp, ValDLDir_temp);

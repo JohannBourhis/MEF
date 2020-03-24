@@ -1,4 +1,4 @@
-int LecSMO(int *NbCoef, int *NbLign, float **MatriceO, int **AdPrCoefLiO,
+int LecSMO(int *NbLign, float **MatriceO, int **AdPrCoefLiO,
             int **NumColO, float **SecMembreO);
 
 int dSMDaSMO(int *NbLign, float *SecMembreO, int *AdPrCoefLiO,

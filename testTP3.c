@@ -19,7 +19,7 @@ int main(){
   int **ngnel;
   int **nRefAr;
 
-  char *ficmai = "car1x1t_1";
+  char *ficmai = "car3x3t_3";
   printf("lecfima\n");
   lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel, &nbneel, &nbaret, &nRefAr);
   // Numero des ref des aretes
@@ -39,39 +39,40 @@ int main(){
 
   printf("declaration des tableaux de la SMD\n");
   //déclaration des tableaux de la SMD
-  int NbCoef[1],NbLign[1], *AdPrCoefLi, *AdSuccLi, *NumDLDir, *NumCol;
-  float *Matrice, *SecMembre, *ValDLDir;
+  int NbLign[1];
   NbLign[0]=nbtng;
   //allocation
-  int dimDiag = NbLign[0];
-  int dimLmat = dimDiag*(typel+1);
-  Matrice=malloc((dimLmat+dimDiag)*sizeof(float)); if(Matrice==NULL){return 1;}
-  NumCol=malloc(dimLmat*sizeof(int)); if(NumCol==NULL){return 1;}
-  AdSuccLi=malloc(dimLmat*sizeof(float)); if(AdSuccLi==NULL){return 1;}
-  AdPrCoefLi=malloc(dimDiag*sizeof(float)); if(AdPrCoefLi==NULL){return 1;}
-  SecMembre=malloc(dimDiag*sizeof(float)); if(SecMembre==NULL){return 1;}
-  NumDLDir=malloc(dimDiag*sizeof(int)); if(NumDLDir==NULL){return 1;}
-  ValDLDir=malloc(dimDiag*sizeof(float)); if(ValDLDir==NULL){return 1;}
+  int dimLmat = (*NbLign)*(typel+1);
+  float *Matrice=malloc((dimLmat+*NbLign)*sizeof(float)); if(Matrice==NULL){return 1;}
+  int *NumCol=malloc(dimLmat*sizeof(int)); if(NumCol==NULL){return 1;}
+  int *AdSuccLi=malloc(dimLmat*sizeof(int)); if(AdSuccLi==NULL){return 1;}
+  int *AdPrCoefLi=malloc(*NbLign*sizeof(int)); if(AdPrCoefLi==NULL){return 1;}
+  float *SecMembre=malloc(*NbLign*sizeof(float)); if(SecMembre==NULL){return 1;}
+  int *NumDLDir=malloc(*NbLign*sizeof(int)); if(NumDLDir==NULL){return 1;}
+  float *ValDLDir=malloc(*NbLign*sizeof(float)); if(ValDLDir==NULL){return 1;}
 
   //tests des fonctions
   printf("assemblage\n");
   assemblage(ntel, typel, nbneel, nbaret, nRefDom, coord, nRefAr, ngnel,
              nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
-             NbLign, NbCoef, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
+             NbLign, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
              NumDLDir, ValDLDir);
-
+  printf("affichage après assemblage (en dehors de LecSMD)\n");
+  affsmd_(NbLign, AdPrCoefLi, NumCol, AdSuccLi, Matrice,
+          SecMembre, NumDLDir, ValDLDir);
   printf("EcrSMD\n");
-  EcrSMD(NbCoef, NbLign, Matrice, AdPrCoefLi, AdSuccLi,
+  EcrSMD(NbLign, Matrice, AdPrCoefLi, AdSuccLi,
          NumCol, SecMembre, NumDLDir, ValDLDir);
 
-  float *MatriceO = malloc(*NbCoef*sizeof(float));
-  int *NumColO = malloc(*NbCoef*sizeof(int));
+  int NbCoef = AdPrCoefLi[*NbLign-1]-1;
+  float *MatriceO = malloc((NbCoef+*NbLign)*sizeof(float));
+  int *NumColO = malloc(NbCoef*sizeof(int));
 
-  printf("Assemblage de SMO");
+  printf("Assemblage de SMO\n");
   dSMDaSMO(NbLign, SecMembre, AdPrCoefLi, MatriceO, NumColO);
   printf("LecSMO\n");
-  int LNbCoef, LNbLign, *LAdPrCoefLiO, *LNumColO;
+  int LNbLign, *LAdPrCoefLiO, *LNumColO;
   float *LMatriceO, *LSecMembreO;
-  LecSMO(&LNbCoef, &LNbLign, &LMatriceO, &LAdPrCoefLiO,
+  LecSMO(&LNbLign, &LMatriceO, &LAdPrCoefLiO,
          &LNumColO, &LSecMembreO);
 }
