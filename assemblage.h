@@ -7,7 +7,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
 void EcrSMD(int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir);
 
- void LecSMD(int *NbLign, float **Matrice, int **AdPrCoefLi, int **AdSuccLi,
-  int **NumCol, float **SecMembre, int **NumDLDir, float **ValDLDir);
+ void LecSMD(int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
+  int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir);
 
 

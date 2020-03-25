@@ -27,33 +27,25 @@ Arguments du stokage ordoné :
   NumDLDir   : tableau de description des conditions de Dirichlet
   ValDLDir   : valeur de blocage aux noeuds Dirichlet non homogenes
  ------------------------------------------- */
-int dSMDaSMO(int *NbLign, float *SecMembreO, int *AdPrCoefLiO,
-              float *MatriceO, int *NumColO){
-  //Variables nécessaires à la SMD
-  float *Matrice;
-  int *AdPrCoefLi;
-  int *AdSuccLi;
-  int *NumCol;
-  float *SecMembre;
-  int *NumDLDir;
-  float *ValDLDir;
+int dSMDaSMO(int *NbLign, float *MatriceO, int *NumColO, float *Matrice,
+             float *SecMembre, int *AdPrCoefLi, int *AdSuccLi, float *ValDLDir,
+             int *NumDLDir, int *NumCol){
   //Lecture de la SMD
   printf("Lecture SMD\n");
-  LecSMD(NbLign, &Matrice, &AdPrCoefLi, &AdSuccLi,
-         &NumCol, &SecMembre, &NumDLDir, &ValDLDir);
+  LecSMD(NbLign, Matrice, AdPrCoefLi, AdSuccLi,
+         NumCol, SecMembre, NumDLDir, ValDLDir);
   //Appel à la procèdure fortran pour creer le SMO
   cdesse_(NbLign, AdPrCoefLi, NumCol, AdSuccLi, Matrice, SecMembre, NumDLDir, ValDLDir,
-          AdPrCoefLiO, NumColO, MatriceO, SecMembreO);
+          AdPrCoefLi, NumColO, MatriceO, SecMembre);
   //écriture de la SMO
   FILE* SMO;
   if((SMO = fopen("SMO.txt", "w")) != NULL){
     fwrite(NbLign, sizeof(int), 1, SMO);
-    fwrite(SecMembreO, sizeof(float), *NbLign, SMO);
-    fwrite(AdPrCoefLiO, sizeof(int), *NbLign, SMO);
-    int NbCoef = AdPrCoefLiO[*NbLign-1]-1;
-    printf("::: %d :::" , NbCoef);
+    fwrite(SecMembre, sizeof(float), *NbLign, SMO);
+    fwrite(AdPrCoefLi, sizeof(int), *NbLign, SMO);
+    int NbCoef = AdPrCoefLi[*NbLign-1]-1;
     fwrite(MatriceO, sizeof(float), *NbLign+NbCoef, SMO);
-    fwrite(NumColO, sizeof(float), NbCoef, SMO);
+    fwrite(NumColO, sizeof(int), NbCoef, SMO);
     fclose(SMO);
   }
   else{
@@ -69,28 +61,20 @@ int dSMDaSMO(int *NbLign, float *SecMembreO, int *AdPrCoefLiO,
  Procédure qui lit la SMO de A
  Tous les arguments sont des arguments de sorties, toutes les informations sont écrites sur le fichier
  ----------------------------------------------*/
-int LecSMO(int *NbLign, float **MatriceO, int **AdPrCoefLiO,
-            int **NumColO, float **SecMembreO){
+int LecSMO(int *NbLign, float *MatriceO, int *AdPrCoefLiO,
+            int *NumColO, float *SecMembreO){
   FILE* SMO;
   // on peut utiliser une chaine de caractère pour transmettre le nom du fichier texte
   if((SMO = fopen("SMO.txt", "r")) != NULL){
     fread(NbLign, sizeof(int), 1, SMO);
     // allocation des tableaux temporaires
-    float *SecMembre_temp = malloc((*NbLign)*sizeof(float)); if(SecMembre_temp==NULL){return 1;}
-    int *AdPrCoefLi_temp = malloc((*NbLign)*sizeof(int)); if(AdPrCoefLi_temp==NULL){return 1;}
-    fread(SecMembre_temp, sizeof(float), *NbLign, SMO);
-    fread(AdPrCoefLi_temp, sizeof(int), *NbLign, SMO);
-    int NbCoef = AdPrCoefLi_temp[*NbLign-1]-1;
-	float *Matrice_temp = malloc(NbCoef*sizeof(float)); if(Matrice_temp==NULL){return 1;}
-	int *NumCol_temp = malloc(NbCoef*sizeof(float)); if(NumCol_temp==NULL){return 1;}
-	fread(Matrice_temp, sizeof(float), *NbLign+NbCoef, SMO);
-	fread(NumCol_temp, sizeof(float), NbCoef, SMO);
+    fread(SecMembreO, sizeof(float), *NbLign, SMO);
+    fread(AdPrCoefLiO, sizeof(int), *NbLign, SMO);
+    int NbCoef = AdPrCoefLiO[*NbLign-1]-1;
+	fread(MatriceO, sizeof(float), *NbLign+NbCoef, SMO);
+	fread(NumColO, sizeof(int), NbCoef, SMO);
     //transmission des tableaux en dehors de la fonction
-    *SecMembreO = SecMembre_temp;
-    *AdPrCoefLiO = AdPrCoefLi_temp;
-    *MatriceO = Matrice_temp;
-    *NumColO = NumCol_temp;
-    affsmo_(NbLign,*AdPrCoefLiO,*NumColO,*MatriceO,*SecMembreO);
+    affsmo_(NbLign,AdPrCoefLiO,NumColO,MatriceO,SecMembreO);
     fclose(SMO);
   }
   else {

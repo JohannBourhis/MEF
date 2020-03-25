@@ -18,10 +18,11 @@ int main(){
   float **coord;
   int **ngnel;
   int **nRefAr;
-
-  char *ficmai = "car3x3t_3";
+  //lecture du fichier de maillage
+  char *ficmai = "car1x1t_1";
   printf("lecfima\n");
-  lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel, &nbneel, &nbaret, &nRefAr);
+  lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel,
+          &nbneel, &nbaret, &nRefAr);
   // Numero des ref des aretes
   int nRefDom=0;
   // Dirichlet
@@ -36,43 +37,47 @@ int main(){
   int nbRefF1=2;
   int numRefF1[nbRefF1];
   numRefF1[0]=2; numRefF1[1]=3;
-
   printf("declaration des tableaux de la SMD\n");
   //déclaration des tableaux de la SMD
-  int NbLign[1];
-  NbLign[0]=nbtng;
-  //allocation
-  int dimLmat = (*NbLign)*(typel+1);
-  float *Matrice=malloc((dimLmat+*NbLign)*sizeof(float)); if(Matrice==NULL){return 1;}
-  int *NumCol=malloc(dimLmat*sizeof(int)); if(NumCol==NULL){return 1;}
-  int *AdSuccLi=malloc(dimLmat*sizeof(int)); if(AdSuccLi==NULL){return 1;}
-  int *AdPrCoefLi=malloc(*NbLign*sizeof(int)); if(AdPrCoefLi==NULL){return 1;}
-  float *SecMembre=malloc(*NbLign*sizeof(float)); if(SecMembre==NULL){return 1;}
-  int *NumDLDir=malloc(*NbLign*sizeof(int)); if(NumDLDir==NULL){return 1;}
-  float *ValDLDir=malloc(*NbLign*sizeof(float)); if(ValDLDir==NULL){return 1;}
-
-  //tests des fonctions
+  int dimLmat;
+  switch(typel){
+    case 1:
+      dimLmat = 4*nbtng;
+      break;
+    case 2:
+      dimLmat = 6*nbtng;
+      break;
+  }
+  float *Matrice = malloc((dimLmat+nbtng)*sizeof(float)); if(Matrice==NULL){return 1;}
+  int *NumCol = malloc(dimLmat*sizeof(int)); if(NumCol==NULL){return 1;}
+  int *AdSuccLi = malloc(dimLmat*sizeof(int)); if(AdSuccLi==NULL){return 1;}
+  int *AdPrCoefLi = malloc(nbtng*sizeof(int)); if(AdPrCoefLi==NULL){return 1;}
+  float *SecMembre = malloc(nbtng*sizeof(float)); if(SecMembre==NULL){return 1;}
+  int *NumDLDir = malloc(nbtng*sizeof(int)); if(NumDLDir==NULL){return 1;}
+  float *ValDLDir = malloc(nbtng*sizeof(float)); if(ValDLDir==NULL){return 1;}
   printf("assemblage\n");
   assemblage(ntel, typel, nbneel, nbaret, nRefDom, coord, nRefAr, ngnel,
              nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
-             NbLign, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
+             &nbtng, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
              NumDLDir, ValDLDir);
-  printf("affichage après assemblage (en dehors de LecSMD)\n");
-  affsmd_(NbLign, AdPrCoefLi, NumCol, AdSuccLi, Matrice,
-          SecMembre, NumDLDir, ValDLDir);
   printf("EcrSMD\n");
-  EcrSMD(NbLign, Matrice, AdPrCoefLi, AdSuccLi,
-         NumCol, SecMembre, NumDLDir, ValDLDir);
-
-  int NbCoef = AdPrCoefLi[*NbLign-1]-1;
-  float *MatriceO = malloc((NbCoef+*NbLign)*sizeof(float));
-  int *NumColO = malloc(NbCoef*sizeof(int));
-
+  EcrSMD(&nbtng, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
+         NumDLDir, ValDLDir);
+  // Réinitialisation (car tout est enregistré dans le fichier SMD)
+  free(Matrice); free(AdSuccLi), free(AdPrCoefLi);
+  free(NumCol); free(SecMembre); free(NumDLDir); free(ValDLDir);
+  Matrice = malloc((dimLmat+nbtng)*sizeof(float)); if(Matrice==NULL){return 1;}
+  NumCol = malloc(dimLmat*sizeof(int)); if(NumCol==NULL){return 1;}
+  AdSuccLi = malloc(dimLmat*sizeof(int)); if(AdSuccLi==NULL){return 1;}
+  AdPrCoefLi = malloc(nbtng*sizeof(int)); if(AdPrCoefLi==NULL){return 1;}
+  SecMembre = malloc(nbtng*sizeof(float)); if(SecMembre==NULL){return 1;}
+  NumDLDir = malloc(nbtng*sizeof(int)); if(NumDLDir==NULL){return 1;}
+  ValDLDir = malloc(nbtng*sizeof(float)); if(ValDLDir==NULL){return 1;}
+  float *MatriceO = malloc((dimLmat+nbtng)*sizeof(float)); if(MatriceO==NULL){return 1;}
+  int *NumColO = malloc(dimLmat*sizeof(int)); if(NumcolO==NUL){return 1;}
   printf("Assemblage de SMO\n");
-  dSMDaSMO(NbLign, SecMembre, AdPrCoefLi, MatriceO, NumColO);
+  dSMDaSMO(&nbtng, MatriceO, NumColO, Matrice, SecMembre,
+           AdPrCoefLi, AdSuccLi, ValDLDir, NumDLDir, NumCol);
   printf("LecSMO\n");
-  int LNbLign, *LAdPrCoefLiO, *LNumColO;
-  float *LMatriceO, *LSecMembreO;
-  LecSMO(&LNbLign, &LMatriceO, &LAdPrCoefLiO,
-         &LNumColO, &LSecMembreO);
+  LecSMO(&nbtng, MatriceO, AdPrCoefLi, NumColO, SecMembre);
 }
