@@ -71,8 +71,8 @@ int LecSMO(int *NbLign, float *MatriceO, int *AdPrCoefLiO,
     fread(SecMembreO, sizeof(float), *NbLign, SMO);
     fread(AdPrCoefLiO, sizeof(int), *NbLign, SMO);
     int NbCoef = AdPrCoefLiO[*NbLign-1]-1;
-	fread(MatriceO, sizeof(float), *NbLign+NbCoef, SMO);
-	fread(NumColO, sizeof(int), NbCoef, SMO);
+	  fread(MatriceO, sizeof(float), *NbLign+NbCoef, SMO);
+	  fread(NumColO, sizeof(int), NbCoef, SMO);
     //transmission des tableaux en dehors de la fonction
     affsmo_(NbLign,AdPrCoefLiO,NumColO,MatriceO,SecMembreO);
     fclose(SMO);
