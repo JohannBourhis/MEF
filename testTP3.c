@@ -41,14 +41,7 @@ int main(){
   //déclaration des tableaux de la SMD
   int dimLmat;  
   dimLmat=(2+2*typel)*nbtng;
-  /*switch(typel){
-    case 1:
-      dimLmat = 4*nbtng;
-      break;
-    case 2:
-      dimLmat = 6*nbtng;
-      break;
-  } */
+
   float *Matrice = malloc((dimLmat+nbtng)*sizeof(float)); if(Matrice==NULL){return 1;}
   int *NumCol = malloc(dimLmat*sizeof(int));              if(NumCol==NULL){return 1;}
   int *AdSuccLi = malloc(dimLmat*sizeof(int));            if(AdSuccLi==NULL){return 1;}
@@ -59,10 +52,10 @@ int main(){
   printf("assemblage\n");
   assemblage(ntel, typel, nbneel, nbaret, nRefDom, coord, nRefAr, ngnel,
              nbRefD0, numRefD0, nbRefD1, numRefD1, nbRefF1, numRefF1,
-             &nbtng, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
+             nbtng, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
              NumDLDir, ValDLDir);
   printf("EcrSMD\n");
-  EcrSMD(&nbtng, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
+  EcrSMD(nbtng, Matrice, AdPrCoefLi, AdSuccLi, NumCol, SecMembre,
          NumDLDir, ValDLDir);
   // Réinitialisation (car tout est enregistré dans le fichier SMD)
   free(Matrice); free(AdSuccLi); free(AdPrCoefLi);
@@ -77,7 +70,7 @@ int main(){
   float *MatriceO = malloc((dimLmat+nbtng)*sizeof(float)); if(MatriceO==NULL){return 1;}
   int *NumColO = malloc(dimLmat*sizeof(int));              if(NumColO==NULL){return 1;}
   printf("Assemblage de SMO\n");
-  dSMDaSMO(&nbtng, MatriceO, NumColO, Matrice, SecMembre,
+  dSMDaSMO(MatriceO, NumColO, Matrice, SecMembre,
            AdPrCoefLi, AdSuccLi, ValDLDir, NumDLDir, NumCol);
   printf("LecSMO\n");
   LecSMO(&nbtng, MatriceO, AdPrCoefLi, NumColO, SecMembre);
