@@ -43,3 +43,31 @@ void dSMOaPR (const int NbLign, const int *AdPrCoefLi, const int *NumCol,
   }
   Profil[NbLign-1]=NbLign+k;
 }
+
+
+// Lignes à rajouter dans TP3 :
+
+/*
+int nbcprx = NbLign + 3*dimLmat; // ?????
+MatProf = malloc(nbcprx*sizeof(float));         if(MatProf==NULL){return 1;}
+Profil = malloc(nbtng*sizeof(int));             if(Profil==NULL){return 1;}
+int codret=0;
+
+dSMOaPR(nbtng, AdPrCoefLi, NumColO, MatriceO, nbcprx, 
+        Profil, MatProf, codret);
+if(codret){printf("la taille de MatProf est insuffisante (nbcprx)\n")
+
+dimLmat=Profil[nbtng];
+float eps=1e-6;
+float* ad = malloc(nbtng*sizeof(int));          if(ad==NULL){return 1;}
+ad=&MatProf[0];
+float* al = malloc(dimLmat*sizeof(int));        if(al==NULL){return 1;}
+al=&MatProf[nbtng];
+float* ld = malloc(nbtng*sizeof(int));          if(ld==NULL){return 1;}
+float* ll = malloc(dimLmat*sizeof(int));        if(ll==NULL){return 1;}
+
+//factorisation A=LLt
+ltlpr(nbtng, profil, ad, al, eps, ld, ll);
+
+
+*/
