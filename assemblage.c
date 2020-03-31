@@ -109,12 +109,6 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     fwrite(NumDLDir, sizeof(int), NbLign, SMD);
     fwrite(ValDLDir, sizeof(float), NbLign, SMD);
     fwrite(AdPrCoefLi, sizeof(int), NbLign, SMD);
-
-    printf("AdPrCoefLi : (EcrSMD)\n");
-    for(int i=0; i<NbLign ; i++){
-      printf("%d  %d\n", i, AdPrCoefLi[i]);
-    }
-
     int NbCoef = AdPrCoefLi[NbLign-1]-1;
     fwrite(Matrice, sizeof(float), NbLign+NbCoef, SMD);
     fwrite(NumCol, sizeof(int), NbCoef, SMD);
@@ -134,18 +128,12 @@ int LecSMD(int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
   FILE* SMD;
   if((SMD = fopen("SMD.txt", "rb")) != NULL){
     fread(NbLign, sizeof(int), 1, SMD);
-    printf("NbLign : %d (LecSMD)\n", *NbLign);
   	// lecture
   	fread(SecMembre, sizeof(float), *NbLign, SMD);
   	fread(NumDLDir, sizeof(int), *NbLign, SMD);
   	fread(ValDLDir, sizeof(float), *NbLign, SMD);
   	fread(AdPrCoefLi, sizeof(int), *NbLign, SMD);
-    printf("AdPrCoefLi : (LecSMD)\n");
-    for(int i=0; i<*NbLign ; i++){
-      printf("%d  %d\n", i, AdPrCoefLi[i]);
-    }
   	int NbCoef=AdPrCoefLi[*NbLign-1]-1;
-    printf("NbCoef : %d\n", NbCoef);
   	fread(Matrice, sizeof(float), *NbLign+NbCoef, SMD);
   	fread(NumCol, sizeof(int), NbCoef, SMD);
   	fread(AdSuccLi, sizeof(int), NbCoef, SMD);
