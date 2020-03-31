@@ -103,7 +103,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
  void EcrSMD(int NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
             int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
   FILE* SMD;
-  if((SMD = fopen("SMD.txt", "w")) != NULL){
+  if((SMD = fopen("SMD.txt", "wb")) != NULL){
     fwrite(&NbLign, sizeof(int), 1, SMD);
     fwrite(SecMembre, sizeof(float), NbLign, SMD);
     fwrite(NumDLDir, sizeof(int), NbLign, SMD);
@@ -119,8 +119,8 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
     fwrite(Matrice, sizeof(float), NbLign+NbCoef, SMD);
     fwrite(NumCol, sizeof(int), NbCoef, SMD);
     fwrite(AdSuccLi, sizeof(int), NbCoef, SMD);
-  }
-  fclose(SMD);
+    fclose(SMD);
+  } 
 }
 
 /*--------------------------------------------------
@@ -132,7 +132,7 @@ int assemblage(int ntel, int typel, int nbneel, int nbaret, int nRefDom,
 int LecSMD(int *NbLign, float *Matrice, int *AdPrCoefLi, int *AdSuccLi,
             int *NumCol, float *SecMembre, int *NumDLDir, float *ValDLDir){
   FILE* SMD;
-  if((SMD = fopen("SMD.txt", "r")) != NULL){
+  if((SMD = fopen("SMD.txt", "rb")) != NULL){
     fread(NbLign, sizeof(int), 1, SMD);
     printf("NbLign : %d (LecSMD)\n", *NbLign);
   	// lecture

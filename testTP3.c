@@ -72,7 +72,20 @@ int main(){
   printf("Assemblage de SMO\n");
   dSMDaSMO(MatriceO, NumColO, Matrice, SecMembre,
            AdPrCoefLi, AdSuccLi, ValDLDir, NumDLDir, NumCol);
+
+  // Réinitialisation (car tout est enregistré dans le fichier SMO)
+  free(Matrice); free(AdSuccLi); free(AdPrCoefLi);
+  free(NumCol); free(SecMembre); free(NumDLDir); free(ValDLDir);
+  free(MatriceO); free(NumColO);
+  MatriceO = malloc((dimLmat+nbtng)*sizeof(float)); if(MatriceO==NULL){return 1;}
+  NumColO = malloc(dimLmat*sizeof(int));            if(NumColO==NULL){return 1;}
+  AdPrCoefLi = malloc(nbtng*sizeof(int));           if(AdPrCoefLi==NULL){return 1;}
+  SecMembre = malloc(nbtng*sizeof(float));          if(SecMembre==NULL){return 1;}
   printf("LecSMO\n");
   LecSMO(&nbtng, MatriceO, AdPrCoefLi, NumColO, SecMembre);
+  printf("affichage SMO : (testTP3)\n");
+  affsmo_(&nbtng,AdPrCoefLi,NumColO,MatriceO,SecMembre);
   printf("End\n");
+
+  
 }
