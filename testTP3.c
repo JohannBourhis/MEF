@@ -6,9 +6,11 @@
 #include "assemblage.h"
 #include "syslin.h"
 #include "forfun.h"
-
+#include "resol.h"
+int nucas;
  // gcc * -lm   pour utiliser math.h
 int main(){
+  nucas = 1;
   printf("start\n");
   int typel;
   int nbaret;
@@ -19,27 +21,27 @@ int main(){
   int **ngnel;
   int **nRefAr;
   //lecture du fichier de maillage
-  char *ficmai = "car3x3t_3";
+  char *ficmai = "d1t1_2.txt";
   printf("lecfima\n");
   lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel,
           &nbneel, &nbaret, &nRefAr);
   // Numero des ref des aretes
-  int nRefDom=0;
+  int nRefDom=4;
   // Dirichlet
-  int nbRefD0=1;
+  int nbRefD0=4;
   int numRefD0[nbRefD0];
-  numRefD0[0]=1;
+  numRefD0[0]=1; numRefD0[1]=2; numRefD0[2]=3; numRefD0[3]=4;
   // Dirichlet non-homogène
-  int nbRefD1=1;
+  int nbRefD1=0;
   int numRefD1[nbRefD1];
-  numRefD1[0]=4;
+  //numRefD1[0]=4;
   // Neumann
-  int nbRefF1=2;
+  int nbRefF1=0;
   int numRefF1[nbRefF1];
-  numRefF1[0]=2; numRefF1[1]=3;
+  //numRefF1[0]=2; numRefF1[1]=3;
   printf("declaration des tableaux de la SMD\n");
   //déclaration des tableaux de la SMD
-  int dimLmat;  
+  int dimLmat;
   dimLmat=(2+2*typel)*nbtng;
 
   float *Matrice = malloc((dimLmat+nbtng)*sizeof(float)); if(Matrice==NULL){return 1;}
@@ -87,5 +89,57 @@ int main(){
   affsmo_(&nbtng,AdPrCoefLi,NumColO,MatriceO,SecMembre);
   printf("End\n");
 
-  
+  // Détermination de la taille de MatProf
+  int indCol;
+  int nbcprx=0;
+  for(int i=0; i<nbtng-1; i++){
+    if( (AdPrCoefLi[i+1]-AdPrCoefLi[i]) !=0 ){
+      indCol = NumColO[AdPrCoefLi[i]-1];
+      nbcprx += (i+1) - (indCol-1);
+    }
+  }
+  printf("nbcprx = %d\n", nbcprx);
+
+  float* MatProf = malloc((nbtng+nbcprx)*sizeof(float)); if(MatProf==NULL){return 1;}
+  int* Profil = malloc(nbtng*sizeof(int));       if(Profil==NULL){return 1;}
+  int codret;
+  printf("Conversion stockage profile \n");
+  dSMOaPR(nbtng, AdPrCoefLi, NumColO, MatriceO, nbcprx,
+          Profil, MatProf, &codret);
+  if(codret){printf("la taille de MatProf est insuffisante (nbcprx)\n");}
+
+  /*
+  printf("Affichage profile\n");
+  for(int i=0; i<nbtng+nbcprx; i++){
+    printf("%f \n",MatProf[i]);
+  }
+  printf("Profile :\n");
+  for(int i=0; i<nbtng; i++){
+    printf("%d \n",Profil[i]);
+  }
+  */
+  dimLmat = Profil[nbtng-1];
+  float eps = 1e-6;
+  float *ad = &MatProf[0];
+  float *al = &MatProf[nbtng];
+  float *ld = malloc(nbtng*sizeof(float));   if(ld==NULL){return 1;}
+  float *ll = malloc(nbtng*(nbtng-1)/2*sizeof(float)); if(ll==NULL){return 1;} // matrice pleine ?
+
+  printf("Factorisation A=L*Lt/n");
+  ltlpr_(&nbtng, Profil, ad, al, &eps, ld, ll);
+  printf("Résolution du premier système triangulaire\n");
+  float* Y = malloc(nbtng*sizeof(float)); if(Y==NULL){return 1;}
+  rsprl_(&nbtng, Profil, ld, ll, SecMembre, Y);
+  printf("Résolution du second système triangulaire\n");
+  float* U = malloc(nbtng*sizeof(float)); if(U==NULL){return 1;}
+  rspru_(&nbtng, Profil, ld, ll, Y, U);
+  printf("Calcul de la solution théorique\n");
+  float* Uex = malloc(nbtng*sizeof(float));   if(Uex==NULL){return 1;}
+  //Calcul de la soltuion exacte
+  Calsol(nbtng, coord, Uex);
+  printf("Calcul de l'erreur\n");
+  //Affichage de la solution
+  int impfch=-1;
+  affsol_(&nbtng, coord[0], U, Uex, &impfch);
+  printf("g\n");
 }

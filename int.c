@@ -10,7 +10,7 @@
 Arguments d'entrée :
 	int nbneel : nombre de noeud par élément (induit le type d'élément)
 	float **coorEl : les noeuds de l'element K
-	
+
 Arguments de sortie :
         float** MatElem : Les éléments de la matrice élémentaire, pour tout i,j
 	float* SmbreElm : Les éléments du second membre, pour tout i
@@ -43,8 +43,8 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
   // Calcul des points de quadrature de l'élément de référence
   ppquad(nbneel, Wq, Xq);
   for(i=0; i<nQuad; i++){
-    calFbase(nbneel, Xq[i], fctbase); 
-    calDerFbase(nbneel, Xq[i], Derfctbase); 
+    calFbase(nbneel, Xq[i], fctbase);
+    calDerFbase(nbneel, Xq[i], Derfctbase);
     transFk(nbneel, coorEl, Fk, fctbase); // Fk : valeur de Fk en xq[i]
     matJacob(nbneel, 2, Jac, coorEl, Derfctbase);
     invertM2x2(Jac, &detJac, InvJac);
@@ -56,9 +56,9 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
     eltdif=detJac*Wq[i];
     cofvarW=FOMEGA(Fk);
     cofvarWW=A00(Fk);
-    cofvarADWDW[0][0]=A11(Fk); cofvarADWDW[0][1]=A12(Fk); 
+    cofvarADWDW[0][0]=A11(Fk); cofvarADWDW[0][1]=A12(Fk);
     cofvarADWDW[1][0]=A21(Fk); cofvarADWDW[1][1]=A22(Fk);
-    
+
     // Calcul des integrales
     W(nbneel, fctbase, eltdif, cofvarW, SMbrElm);
     WW(nbneel, fctbase, eltdif, cofvarWW, MatElem);
@@ -74,14 +74,14 @@ int intElem(int nbneel, float **coorEl, float *SMbrElm, float **MatElem){
 /*==============================================
 Arguments d'entrée :
 	float **coorAr : coordonnÃ©es des noeuds de l'arrete selectionÃ©e
-				
+
 Arguments de sortie :
 	float* SMbrAret : les valeurs de l'intégrale de f*w_i sur K, pour tout i
 	float** MatAret : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
 int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   int i, nbneel=2, nQuad=3;
-  float L, eltdif; 
+  float L, eltdif;
   float cofvarW, cofvarWW;
 
   float Fk[2];
@@ -94,11 +94,11 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
   // Calcul des points de quadrature
   ppquad(nbneel, Wq, Xq);
   for(i=0; i<nQuad; i++){
-    calFbase(nbneel, Xq[i], fctbase); 
-    calDerFbase(nbneel, Xq[i], Derfctbase); 
+    calFbase(nbneel, Xq[i], fctbase);
+    calDerFbase(nbneel, Xq[i], Derfctbase);
     matJacob(nbneel, 1, Jac, coorAr, Derfctbase);
     transFk(nbneel, coorAr, Fk, fctbase); // Fk : valeur de Fk en xq[i]
-    L=sqrt(Jac[0][0]*Jac[0][0] + Jac[1][0]*Jac[1][0]);	
+    L=sqrt(Jac[0][0]*Jac[0][0] + Jac[1][0]*Jac[1][0]);
     eltdif=L*Wq[i];
     cofvarW=FN(Fk);
     cofvarWW=BN(Fk);
@@ -132,14 +132,14 @@ Arguments de sortie :
   SMbrElem : éléments du second membre
   NuDElem  : noeuds qui ont la condition de dirichlet (0, 1, ou -1)
   uDElem   : valeur de la condition de dirichlet
- ------------------------------------------- */ 
-int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl, 
-  int nbRefD0, int *numRefD0, int nbRefD1, int *numRefD1, int nbRefF1, int *numRefF1, 
+ ------------------------------------------- */
+int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
+  int nbRefD0, int *numRefD0, int nbRefD1, int *numRefD1, int nbRefF1, int *numRefF1,
     float **MatElem, float *SMbrElem, int *NuDElem, float *uDElem){
 
   int i, j, k, l, nk, nl, R, condAr;
   int numNoeuds[2]; float *coorAr[2];
-  
+
   // Mini-matrice pour les aretes
   float *SMbrAret, **MatAret;
   SMbrAret = malloc(2*sizeof(float)); if(SMbrAret == NULL){return 1;}
@@ -161,21 +161,21 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   for (i=0; i<nbaret ; i++){   // (i+1) numéro local de l'arrete
     condAr=nRefArEl[i];
     if (condAr == nRefDom){
-      continue; // on passe au i suivant 
+      continue; // on passe au i suivant
     }
     // Dirichlet homogène
     for (j=0; j<nbRefD0; j++){
-      if (numRefD0[j]==condAr){  
+      if (numRefD0[j]==condAr){
         numNaret(nbneel, i+1, numNoeuds);
         NuDElem[numNoeuds[0]-1]=0;
-        NuDElem[numNoeuds[1]-1]=0;        
+        NuDElem[numNoeuds[1]-1]=0;
         break;
       }
     }
     // Dirichlet non-homogène
     for(j=0; j<nbRefD1; j++){
-      if (numRefD1[j]==condAr) {  
-        numNaret(nbneel, i+1, numNoeuds);  
+      if (numRefD1[j]==condAr) {
+        numNaret(nbneel, i+1, numNoeuds);
         NuDElem[numNoeuds[0]-1]=-1;
         NuDElem[numNoeuds[1]-1]=-1;
         selectPts(2,numNoeuds, coorEl, coorAr);
@@ -186,17 +186,17 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
     }
     // Neumann ou Fourier     // num-noeuds decale les indices
     for(j=0; j<nbRefF1; j++){
-      if (numRefF1[j]==condAr) {  
-        numNaret(nbneel, i+1, numNoeuds); 
-        selectPts(2, numNoeuds, coorEl, coorAr);	
-        // initialisation de MatAret et SmbAret    
+      if (numRefF1[j]==condAr) {
+        numNaret(nbneel, i+1, numNoeuds);
+        selectPts(2, numNoeuds, coorEl, coorAr);
+        // initialisation de MatAret et SmbAret
         for(k=0; k<2; k++){
 		  SMbrAret[k]=0;
 		  for(l=0; l<2; l++){
 			MatAret[k][l]=0;
 		  }
 		}
-        //Calcul des intégrales linéiques 
+        //Calcul des intégrales linéiques
         R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
         if(R){return R;}
         for(k=0; k<2; k++){  /// changement k<2
@@ -204,7 +204,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
           SMbrElem[nk] += SMbrAret[k];
           for(l=0; l<2; l++){  /// changement k<2
             nl = numNoeuds[l]-1;
-            MatElem[nk][nl]+=MatAret[k][l]; 
+            MatElem[nk][nl]+=MatAret[k][l];
           }
         }
          break;
@@ -215,7 +215,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   freetab(MatAret);
   return 0;
 }
-
+extern int nucas;
 // fonctions
 float A12(float *x){
   return 0.0;
@@ -230,19 +230,22 @@ float A21(float *x){
   return 0.0;
 }
 float A00(float *x){
-  return 1.0;
+  return 0.0;
 }
 float BN(float *x){
   return 1.0;
 }
 float FOMEGA(float *x){
-  return 1.0;
+  //const float PI=3.141592;
+  //return -2*PI*PI*sin(PI*x[0])*sin(PI*x[1]);
+  return 16.*(x[0]*(1-x[0]-2*x[1]+2*x[0]*x[1])+x[1]*(1-x[1]-2*x[0]+2*x[0]*x[1]));
 }
 float FN(float *x){
-  return 1.0;
+  return 0.0;
 }
 float UD(float *x){
   return 100*x[0]+x[1];
+  return 0.0;
 }
 
 // intégration
@@ -254,14 +257,14 @@ Arguments d'entree :
   nbneel : nombre de noeuds de l'element
   fctbas : valeurs des fonctions de base au point de quadrature courant
   		   dimension utiles : fctbas(nbeel)
-  eltdif : element differentiel(jacobienne de FK en xq) multipliÃ© par le poids de quadrature 
-  cofvar : valeur du coefficient variable (fonction Ã  integrer calculÃ©e en l'image par FK 
+  eltdif : element differentiel(jacobienne de FK en xq) multipliÃ© par le poids de quadrature
+  cofvar : valeur du coefficient variable (fonction Ã  integrer calculÃ©e en l'image par FK
   			du point de quad courant xq)
   vectelm : vecteur elementaire de masse a  actualiser
   			Dimension utile : vectelm(nbneel)
  Argument de sortie :
   vectelm : vecteur elementaire de masse actualisee
- ------------------------------------------- */ 
+ ------------------------------------------- */
 void W(int nbneel, float *fctbas, float eltdif, float cofvar, float *vectelm){
   int i;
   for(i=0 ; i<nbneel ; i++){
@@ -276,15 +279,15 @@ Arguments d'entrée :
   nbneel : nombre de noeuds de l'element
   fctbas : valeurs des fonctions de base au point de quadrature courant
   		   dimension utiles : fctbas(nbeel)
-  eltdif : élément différentiel(jacobienne en xq) multiplié par le poids de quadrature 
-  cofvar : valeur du coefficient variable (fonction à integrer calculée en l'image par FK 
+  eltdif : élément différentiel(jacobienne en xq) multiplié par le poids de quadrature
+  cofvar : valeur du coefficient variable (fonction à integrer calculée en l'image par FK
   			du point de quad courant xq)
   matelm : matrice élémentaire de masse à actualiser
   			Dimension utile : matelm(nbneel, nbneel)
  Argument de sortie :
   matelm : matrice élémentaire de masse actualisée
- ------------------------------------------- */ 
-void WW(int nbneel, float *fctbas, float eltdif, float cofvar, float **matelm){ 
+ ------------------------------------------- */
+void WW(int nbneel, float *fctbas, float eltdif, float cofvar, float **matelm){
   int i,j;
   float coeff;
   for(i=0; i<nbneel; i++){
@@ -303,10 +306,10 @@ Arguments d'entrée :
   nbneel : nombre de noeuds de l'element
   fctbas : matrice des valeurs des fonctions de base au point de quadrature courant
   		   dimension utiles : fctbas(2,nbeel)
-  InvJac : matrice de jacobienne de Fk^-1 
-  		   dimension : InvJac(2,2) 
-  eltdif : élément différentiel(jacobienne en xq) multiplié par le poids de quadrature 
-  cofvar : valeurs du coefficient variable (fonction à integrer calculée en l'image par FK 
+  InvJac : matrice de jacobienne de Fk^-1
+  		   dimension : InvJac(2,2)
+  eltdif : élément différentiel(jacobienne en xq) multiplié par le poids de quadrature
+  cofvar : valeurs du coefficient variable (fonction à integrer calculée en l'image par FK
   			du point de quad courant xq)
   			Dimension utile : cofvar(4)
   			cofvar[0]=a_11(Fk(xq)) ; cofvar[1]=a_12(Fk(xq))  ; cofvar[2]=a_21(Fk(xq)) ; cofvar[3]=a_22(Fk(xq))
@@ -314,7 +317,7 @@ Arguments d'entrée :
   			Dimension utile : matelm(nbneel, nbneel)
  Argument de sortie :
   matelm : matrice élémentaire de masse actualisée
- ------------------------------------------- */ 
+ ------------------------------------------- */
 void ADWDW(int nbneel, float **Derfctbas, float **InvJac, float eltdif, float **cofvar, float **matelm){
   int i,j,alpha,beta;
   float DWi, DWj, coeff;
