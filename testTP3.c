@@ -11,7 +11,7 @@
 int nucas;
 
 int main(){
-  nucas = 2;
+  nucas = 3;
   printf("start\n");
   int typel;
   int nbaret;
@@ -33,13 +33,23 @@ int main(){
   int numRefD0[nbRefD0];
   numRefD0[0]=1; numRefD0[1]=2; numRefD0[2]=3; numRefD0[3]=4;
   // Dirichlet non-homogène
-  int nbRefD1=0;
+  int nbRefD1=4;
   int numRefD1[nbRefD1];
+  numRefD1[0]=1; numRefD1[1]=2; numRefD1[2]=3; numRefD1[3]=4;
   //numRefD1[0]=4;
   // Neumann
   int nbRefF1=0;
   int numRefF1[nbRefF1];
-  //numRefF1[0]=2; numRefF1[1]=3;
+
+  switch(nucas){
+    case 3:
+      nbRefD0=0;
+      break;
+    default:
+      nbRefD1=0;
+      break;
+  }
+
   printf("declaration des tableaux de la SMD\n");
   //déclaration des tableaux de la SMD
   int dimLmat;

@@ -238,7 +238,6 @@ float BN(float *x){
 float FOMEGA(float *x){
   float val;
   const float PI=3.141592;
-  return -2*PI*PI*sin(PI*x[0])*sin(PI*x[1]);
   switch(nucas){
    case 1:
      val = 32.*( x[1]*(1-x[1]) + x[0]*(1-x[0]) );
@@ -250,7 +249,7 @@ float FOMEGA(float *x){
      val = 2.*PI*PI*cos(PI*x[0])*cos(PI*x[1]);
      break;
    default:
-     printf("problème non traité\n");
+     printf("*** SOLEX : exemple non prevu. Abandon.\n");
      exit(1);
      break;
   }
@@ -259,9 +258,26 @@ float FOMEGA(float *x){
 float FN(float *x){
   return 0.0;
 }
-float UD(float *x){
-  //return 100*x[0]+x[1];
-  return 1.0;
+float UD(float *x){ // correspond à la solution exacte des 3 exemples
+  const float PI=3.141592;
+  float val;
+
+  switch (nucas) {
+    case 1 :
+      val=16.*x[0]*x[1]*(1-x[0])*(1-x[1]);
+      break;
+    case 2 :
+      val=sin(PI*x[0])*sin(PI*x[1]);
+      break;
+    case 3 :
+      val=cos(PI*x[0])*cos(PI*x[1]);
+      break;
+    default :
+      printf("*** SOLEX : exemple non prevu. Abandon.\n");
+      exit(1);
+      break;
+  }
+  return(val);
 }
 
 // intégration

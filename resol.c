@@ -48,7 +48,7 @@ void dSMOaPR (const int NbLign, const int *AdPrCoefLi, const int *NumCol,
       nbCoefProf = (i+1) - Iref;
       if(FirstLiProf-1 + nbCoefProf > nbcprx){ // taille insuffisante
         *codret=1;
-        break;
+        exit(1);
       }
       for(int j=0 ; j<nbCoefLi ; j++){
         I = NumCol[counterSMO+j] - Iref;
