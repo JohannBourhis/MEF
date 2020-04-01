@@ -105,7 +105,7 @@ float solex(float *coor){
 --------------------------------------------------------------------------------
 */
 void Calsol( int NbLign, float** coord, float *Uex){
-  for(int i=0; i<NbLign-1; i++){
+  for(int i=0; i<NbLign; i++){
     Uex[i]=solex(coord[i]);
   }
 }

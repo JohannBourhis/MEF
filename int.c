@@ -233,19 +233,35 @@ float A00(float *x){
   return 0.0;
 }
 float BN(float *x){
-  return 1.0;
+  return 0.0;
 }
 float FOMEGA(float *x){
-  //const float PI=3.141592;
-  //return -2*PI*PI*sin(PI*x[0])*sin(PI*x[1]);
-  return 16.*(x[0]*(1-x[0]-2*x[1]+2*x[0]*x[1])+x[1]*(1-x[1]-2*x[0]+2*x[0]*x[1]));
+  float val;
+  const float PI=3.141592;
+  return -2*PI*PI*sin(PI*x[0])*sin(PI*x[1]);
+  switch(nucas){
+   case 1:
+     val = 32.*( x[1]*(1-x[1]) + x[0]*(1-x[0]) );
+     break;
+   case 2:
+     val = 2.*PI*PI*sin(PI*x[0])*sin(PI*x[1]);
+     break;
+   case 3:
+     val = 2.*PI*PI*cos(PI*x[0])*cos(PI*x[1]);
+     break;
+   default:
+     printf("problème non traité\n");
+     exit(1);
+     break;
+  }
+  return val;
 }
 float FN(float *x){
   return 0.0;
 }
 float UD(float *x){
-  return 100*x[0]+x[1];
-  return 0.0;
+  //return 100*x[0]+x[1];
+  return 1.0;
 }
 
 // intégration

@@ -7,10 +7,11 @@
 #include "syslin.h"
 #include "forfun.h"
 #include "resol.h"
+
 int nucas;
- // gcc * -lm   pour utiliser math.h
+
 int main(){
-  nucas = 1;
+  nucas = 2;
   printf("start\n");
   int typel;
   int nbaret;
@@ -21,12 +22,12 @@ int main(){
   int **ngnel;
   int **nRefAr;
   //lecture du fichier de maillage
-  char *ficmai = "d1t1_2.txt";
+  char *ficmai = "d1t1_64.txt";
   printf("lecfima\n");
   lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel,
           &nbneel, &nbaret, &nRefAr);
   // Numero des ref des aretes
-  int nRefDom=4;
+  int nRefDom=0;
   // Dirichlet
   int nbRefD0=4;
   int numRefD0[nbRefD0];
@@ -87,7 +88,6 @@ int main(){
   LecSMO(&nbtng, MatriceO, AdPrCoefLi, NumColO, SecMembre);
   printf("affichage SMO : (testTP3)\n");
   affsmo_(&nbtng,AdPrCoefLi,NumColO,MatriceO,SecMembre);
-  printf("End\n");
 
   // Détermination de la taille de MatProf
   int indCol;
@@ -101,28 +101,21 @@ int main(){
   printf("nbcprx = %d\n", nbcprx);
 
   float* MatProf = malloc((nbtng+nbcprx)*sizeof(float)); if(MatProf==NULL){return 1;}
-  int* Profil = malloc(nbtng*sizeof(int));       if(Profil==NULL){return 1;}
+  int* Profil = malloc(nbtng*sizeof(int));               if(Profil==NULL){return 1;}
   int codret;
   printf("Conversion stockage profile \n");
   dSMOaPR(nbtng, AdPrCoefLi, NumColO, MatriceO, nbcprx,
           Profil, MatProf, &codret);
-  if(codret){printf("la taille de MatProf est insuffisante (nbcprx)\n");}
+  if(codret){
+    printf("la taille de MatProf est insuffisante (nbcprx)\n");
+    return 1;
+  }
 
-  /*
-  printf("Affichage profile\n");
-  for(int i=0; i<nbtng+nbcprx; i++){
-    printf("%f \n",MatProf[i]);
-  }
-  printf("Profile :\n");
-  for(int i=0; i<nbtng; i++){
-    printf("%d \n",Profil[i]);
-  }
-  */
   dimLmat = Profil[nbtng-1];
   float eps = 1e-6;
   float *ad = &MatProf[0];
   float *al = &MatProf[nbtng];
-  float *ld = malloc(nbtng*sizeof(float));   if(ld==NULL){return 1;}
+  float *ld = malloc(nbtng*sizeof(float));             if(ld==NULL){return 1;}
   float *ll = malloc(nbtng*(nbtng-1)/2*sizeof(float)); if(ll==NULL){return 1;} // matrice pleine ?
 
   printf("Factorisation A=L*Lt/n");
@@ -141,5 +134,5 @@ int main(){
   //Affichage de la solution
   int impfch=-1;
   affsol_(&nbtng, coord[0], U, Uex, &impfch);
-  printf("g\n");
+  printf("End\n");
 }
