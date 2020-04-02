@@ -2,6 +2,7 @@
 #include "maille.h"
 #include "calElmt.h"
 #include "int.h"
+#include "fonc.h"
 #include <stdlib.h>
 #include <stdio.h>
 #define EPS 10e-6 //sensibilité pour l'inversibilité de la Jacobienne
@@ -79,7 +80,7 @@ Arguments de sortie :
 	float* SMbrAret : les valeurs de l'intégrale de f*w_i sur K, pour tout i
 	float** MatAret : les valeurs de l'intégrale de a*w_i*w_j sur K, pour tout i,j
 ===============================================*/
-int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
+int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret, int condar){
   int i, nbneel=2, nQuad=3;
   float L, eltdif;
   float cofvarW, cofvarWW;
@@ -100,7 +101,7 @@ int intAret(float *coorAr[], int numNoeuds[], float *SMbrAret, float **MatAret){
     transFk(nbneel, coorAr, Fk, fctbase); // Fk : valeur de Fk en xq[i]
     L=sqrt(Jac[0][0]*Jac[0][0] + Jac[1][0]*Jac[1][0]);
     eltdif=L*Wq[i];
-    cofvarW=FN(Fk);
+    cofvarW=FN(Fk, condar);
     cofvarWW=BN(Fk);
     // Calcul des intégrales
     W(nbneel, fctbase, eltdif, cofvarW, SMbrAret);
@@ -197,7 +198,7 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
 		  }
 		}
         //Calcul des intégrales linéiques
-        R = intAret(coorAr, numNoeuds, SMbrAret, MatAret);
+        R = intAret(coorAr, numNoeuds, SMbrAret, MatAret, condAr);
         if(R){return R;}
         for(k=0; k<2; k++){  /// changement k<2
           nk = numNoeuds[k]-1;
@@ -214,70 +215,6 @@ int cal1Elem(int nbneel, int nbaret, int nRefDom, float **coorEl, int *nRefArEl,
   free(SMbrAret);
   freetab(MatAret);
   return 0;
-}
-extern int nucas;
-// fonctions
-float A12(float *x){
-  return 0.0;
-}
-float A11(float *x){
-  return 1.0;
-}
-float A22(float *x){
-  return 1.0;
-}
-float A21(float *x){
-  return 0.0;
-}
-float A00(float *x){
-  return 0.0;
-}
-float BN(float *x){
-  return 0.0;
-}
-float FOMEGA(float *x){
-  float val;
-  const float PI=3.141592;
-  switch(nucas){
-   case 1:
-     val = 32.*( x[1]*(1-x[1]) + x[0]*(1-x[0]) );
-     break;
-   case 2:
-     val = 2.*PI*PI*sin(PI*x[0])*sin(PI*x[1]);
-     break;
-   case 3:
-     val = 2.*PI*PI*cos(PI*x[0])*cos(PI*x[1]);
-     break;
-   default:
-     printf("*** SOLEX : exemple non prevu. Abandon.\n");
-     exit(1);
-     break;
-  }
-  return val;
-}
-float FN(float *x){
-  return 0.0;
-}
-float UD(float *x){ // correspond à la solution exacte des 3 exemples
-  const float PI=3.141592;
-  float val;
-
-  switch (nucas) {
-    case 1 :
-      val=16.*x[0]*x[1]*(1-x[0])*(1-x[1]);
-      break;
-    case 2 :
-      val=sin(PI*x[0])*sin(PI*x[1]);
-      break;
-    case 3 :
-      val=cos(PI*x[0])*cos(PI*x[1]);
-      break;
-    default :
-      printf("*** SOLEX : exemple non prevu. Abandon.\n");
-      exit(1);
-      break;
-  }
-  return(val);
 }
 
 // intégration
