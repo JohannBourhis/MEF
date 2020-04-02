@@ -1,3 +1,11 @@
+#include <math.h>
+#include "maille.h"
+#include "calElmt.h"
+#include "int.h"
+#include "fonc.h"
+#include <stdlib.h>
+#include <stdio.h>
+
 extern int nucas;
 
 

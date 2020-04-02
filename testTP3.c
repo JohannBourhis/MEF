@@ -22,7 +22,7 @@ int main(){
   int **ngnel;
   int **nRefAr;
   //lecture du fichier de maillage
-  char *ficmai = "d1t1_64.txt";
+  char *ficmai = "maillage/d1tl_64.txt";
   printf("lecfima\n");
   lecfima(ficmai, &typel, &nbtng, &coord, &ntel, &ngnel,
           &nbneel, &nbaret, &nRefAr);
